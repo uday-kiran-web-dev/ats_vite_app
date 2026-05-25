@@ -5,7 +5,7 @@ const calculateMatch = require("../services/matchingService");
 //Applying for a job
 const applyJob = async (req, res) => {
   try {
-    const { jobId, resume, coverLetter, skills } = req.body;
+    const { jobId, resume, coverLetter, skills } = req.body || {};
 
     if (!jobId) {
       return res.status(400).json({
