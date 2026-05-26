@@ -1,35 +1,59 @@
+import { useEffect, useState } from "react";
+
+import API from "../services/api";
+
+import JobCard from "../components/JobCard";
+
 function Jobs() {
+  const [jobs, setJobs] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
+
+  // Fetch jobs
+  const fetchJobs = async () => {
+    try {
+      const { data } = await API.get("/jobs");
+
+      setJobs(data);
+    } catch (error) {
+      setError("Failed to load jobs");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  // Apply to job
+  const applyToJob = async (jobId) => {
+    try {
+      await API.post("/applications/apply", {
+        jobId,
+        skills: ["React", "JavaScript"],
+      });
+
+      alert("Applied Successfully");
+    } catch (error) {
+      alert(error.response?.data?.message || "Application failed");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-10">
-      <h1 className="text-4xl font-bold mb-8 text-center">Available Jobs</h1>
+      <h1 className="text-4xl font-bold text-center mb-10">Available Jobs</h1>
+
+      {loading && <p className="text-center">Loading jobs...</p>}
+
+      {error && <p className="text-center text-red-500">{error}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Sample Job Card */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-bold mb-2">Frontend Developer</h2>
-
-          <p className="text-gray-600 mb-4">Berlin • Full-time</p>
-
-          <p className="mb-4">
-            Looking for React developer with strong JavaScript skills.
-          </p>
-
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Apply Now
-          </button>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-bold mb-2">Backend Developer</h2>
-
-          <p className="text-gray-600 mb-4">Munich • Full-time</p>
-
-          <p className="mb-4">Node.js and MongoDB developer required.</p>
-
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            Apply Now
-          </button>
-        </div>
+        {jobs.map((job) => (
+          <JobCard key={job._id} job={job} onApply={applyToJob} />
+        ))}
       </div>
     </div>
   );

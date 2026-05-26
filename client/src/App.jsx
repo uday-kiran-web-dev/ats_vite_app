@@ -8,6 +8,11 @@ import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./utils/ProtectedRoute";
+import RecruiterJobs from "./pages/RecruiterJobs";
+import Applications from "./pages/Applications";
+import Profile from "./pages/Profile";
+import Candidates from "./pages/Candidates";
+import Analytics from "./pages/Analytics";
 
 function App() {
   return (
@@ -26,6 +31,22 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/applications"
+        element={
+          <ProtectedRoute allowedRoles={["Candidate"]}>
+            <Applications />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute allowedRoles={["Candidate"]}>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
 
       {/* {Recruiter routes} */}
       <Route
@@ -36,6 +57,41 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/recruiter/jobs"
+        element={
+          <ProtectedRoute allowedRoles={["Recruiter"]}>
+            <RecruiterJobs />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/recruiter/applications"
+        element={
+          <ProtectedRoute allowedRoles={["Recruiter"]}>
+            <Applications />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/recruiter/candidates"
+        element={
+          <ProtectedRoute allowedRoles={["Recruiter", "Admin"]}>
+            <Candidates />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/analytics"
+        element={
+          <ProtectedRoute allowedRoles={["Admin", "Recruiter"]}>
+            <Analytics />
+          </ProtectedRoute>
+        }
+      />
 
       {/* {Admin routes} */}
       <Route
@@ -43,6 +99,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["Admin"]}>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/applications"
+        element={
+          <ProtectedRoute allowedRoles={["Admin"]}>
+            <Applications />
           </ProtectedRoute>
         }
       />

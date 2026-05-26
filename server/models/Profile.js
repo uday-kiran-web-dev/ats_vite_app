@@ -17,7 +17,7 @@ const profileSchema = new mongoose.Schema(
         type: String,
       },
     ],
-    expierence: {
+    experience: {
       type: Number,
       default: 0,
     },

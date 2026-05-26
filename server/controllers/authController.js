@@ -73,7 +73,7 @@ const loginUser = async (req, res) => {
         email: user.email,
         role: user.role,
         phone: user.phone,
-        toke: generateToken(user._id),
+        token: generateToken(user._id),
       });
     } else {
       //console.log(error);

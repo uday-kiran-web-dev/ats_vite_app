@@ -83,6 +83,21 @@ function Sidebar() {
               <FaFileAlt />
               Applications
             </Link>
+            <Link
+              to="/recruiter/candidates"
+              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
+            >
+              <FaUsers />
+              Candidates
+            </Link>
+
+            <Link
+              to="/admin/analytics"
+              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
+            >
+              <FaChartBar />
+              Analytics
+            </Link>
           </>
         )}
 
@@ -119,6 +134,21 @@ function Sidebar() {
             >
               <FaFileAlt />
               Applications
+            </Link>
+            <Link
+              to="/recruiter/candidates"
+              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
+            >
+              <FaUsers />
+              Candidates
+            </Link>
+
+            <Link
+              to="/admin/analytics"
+              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
+            >
+              <FaChartBar />
+              Analytics
             </Link>
           </>
         )}
