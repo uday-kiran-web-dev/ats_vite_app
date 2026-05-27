@@ -1,22 +1,27 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 
 export const AuthContext = createContext();
 
 function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
+  // Restore user synchronously on initial render
+  const [user, setUser] = useState(() => {
     const userInfo = localStorage.getItem("userInfo");
-
     if (userInfo) {
-      setUser(JSON.parse(userInfo));
+      try {
+        return JSON.parse(userInfo);
+      } catch (error) {
+        console.error("Failed to parse user info from local storage:", error);
+        localStorage.removeItem("userInfo");
+      }
     }
-  }, []);
+    return null;
+  });
 
   const logout = () => {
     localStorage.removeItem("userInfo");
     setUser(null);
   };
+
   return (
     <AuthContext.Provider
       value={{

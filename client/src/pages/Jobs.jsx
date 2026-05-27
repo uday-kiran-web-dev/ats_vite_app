@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import API from "../services/api";
 
@@ -14,9 +15,12 @@ function Jobs() {
   // Fetch jobs
   const fetchJobs = async () => {
     try {
-      const { data } = await API.get("/jobs");
+      const response = await API.get("/jobs");
+      const jobsData = Array.isArray(response.data)
+        ? response.data
+        : response.data.jobs || [];
 
-      setJobs(data);
+      setJobs(jobsData);
     } catch (error) {
       setError("Failed to load jobs");
     } finally {
@@ -36,9 +40,9 @@ function Jobs() {
         skills: ["React", "JavaScript"],
       });
 
-      alert("Applied Successfully");
+      toast.success("Applied Successfully");
     } catch (error) {
-      alert(error.response?.data?.message || "Application failed");
+      toast.error(error.response?.data?.message || "Application failed");
     }
   };
 

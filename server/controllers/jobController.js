@@ -20,7 +20,7 @@ const createJob = async (req, res) => {
       requirements,
       department,
       location,
-      jobType,
+      jobTpye: jobType || req.body.jobTpye,
       salary,
       status,
       recruiterId: req.user._id,
@@ -92,7 +92,13 @@ const updateJob = async (req, res) => {
     }
 
     //Update job
-    const updatedJob = await Job.findByIdAndUpdate(req.params.id, req.body, {
+    const updateData = { ...req.body };
+    if (req.body.jobType) {
+      updateData.jobTpye = req.body.jobType;
+      delete updateData.jobType;
+    }
+
+    const updatedJob = await Job.findByIdAndUpdate(req.params.id, updateData, {
       returnDocument: "after",
     });
     return res.json(updatedJob);

@@ -1,4 +1,4 @@
-function JobCard({ job, onApply, showActions = false, onDelete }) {
+function JobCard({ job, onApply, showActions = false, onDelete, onEdit }) {
   return (
     <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
       <h2 className="text-2xl font-bold mb-2">{job.title}</h2>
@@ -17,7 +17,7 @@ function JobCard({ job, onApply, showActions = false, onDelete }) {
         ))}
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-wrap">
         {onApply && (
           <button
             onClick={() => onApply(job._id)}
@@ -29,13 +29,16 @@ function JobCard({ job, onApply, showActions = false, onDelete }) {
 
         {showActions && (
           <>
-            <button className="bg-yellow-500 text-white px-4 py-2 rounded">
+            <button
+              onClick={() => onEdit && onEdit(job)}
+              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+            >
               Edit
             </button>
 
             <button
               onClick={() => onDelete(job._id)}
-              className="bg-red-500 text-white px-4 py-2 rounded"
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
             >
               Delete
             </button>

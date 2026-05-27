@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import { useContext } from "react";
 
@@ -10,150 +10,293 @@ import {
   FaChartBar,
   FaFileAlt,
   FaUserCircle,
+  FaTimes,
 } from "react-icons/fa";
 
-function Sidebar() {
+function Sidebar({ isOpen = false, onClose = () => {} }) {
   const { user } = useContext(AuthContext);
 
   return (
-    <div className="w-64 bg-white shadow-lg min-h-screen p-5">
-      <h1 className="text-2xl font-bold text-blue-600 mb-10">ATS System</h1>
+    <>
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
 
-      <nav className="flex flex-col gap-4">
-        {/* Candidate */}
-        {user?.role === "Candidate" && (
-          <>
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaChartBar />
-              Dashboard
-            </Link>
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg p-5 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:shadow-none ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl font-bold text-blue-600">ATS System</h1>
+          <button
+            className="md:hidden p-2 rounded hover:bg-gray-100"
+            onClick={onClose}
+            aria-label="Close sidebar"
+          >
+            <FaTimes />
+          </button>
+        </div>
 
-            <Link
-              to="/"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaBriefcase />
-              Jobs
-            </Link>
+        <nav className="flex flex-col gap-4">
+          {/* Candidate */}
+          {user?.role === "Candidate" && (
+            <>
+              <NavLink
+                to="/dashboard"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaChartBar />
+                Dashboard
+              </NavLink>
 
-            <Link
-              to="/applications"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaFileAlt />
-              Applications
-            </Link>
+              <NavLink
+                to="/"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaBriefcase />
+                Jobs
+              </NavLink>
 
-            <Link
-              to="/profile"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaUserCircle />
-              Profile
-            </Link>
-          </>
-        )}
+              <NavLink
+                to="/applications"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaFileAlt />
+                Applications
+              </NavLink>
 
-        {/* Recruiter */}
-        {user?.role === "Recruiter" && (
-          <>
-            <Link
-              to="/recruiter"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaChartBar />
-              Dashboard
-            </Link>
+              <NavLink
+                to="/profile"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaUserCircle />
+                Profile
+              </NavLink>
+            </>
+          )}
 
-            <Link
-              to="/recruiter/jobs"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaBriefcase />
-              Manage Jobs
-            </Link>
+          {/* Recruiter */}
+          {user?.role === "Recruiter" && (
+            <>
+              <NavLink
+                to="/recruiter"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaChartBar />
+                Dashboard
+              </NavLink>
 
-            <Link
-              to="/recruiter/applications"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaFileAlt />
-              Applications
-            </Link>
-            <Link
-              to="/recruiter/candidates"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaUsers />
-              Candidates
-            </Link>
+              <NavLink
+                to="/recruiter/jobs"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaBriefcase />
+                Manage Jobs
+              </NavLink>
 
-            <Link
-              to="/admin/analytics"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaChartBar />
-              Analytics
-            </Link>
-          </>
-        )}
+              <NavLink
+                to="/recruiter/applications"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaFileAlt />
+                Applications
+              </NavLink>
+              <NavLink
+                to="/recruiter/candidates"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaUsers />
+                Candidates
+              </NavLink>
 
-        {/* Admin */}
-        {user?.role === "Admin" && (
-          <>
-            <Link
-              to="/admin"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaChartBar />
-              Dashboard
-            </Link>
+              <NavLink
+                to="/admin/analytics"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaChartBar />
+                Analytics
+              </NavLink>
+            </>
+          )}
 
-            <Link
-              to="/admin/users"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaUsers />
-              Users
-            </Link>
+          {/* Admin */}
+          {user?.role === "Admin" && (
+            <>
+              <NavLink
+                to="/admin"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaChartBar />
+                Dashboard
+              </NavLink>
 
-            <Link
-              to="/admin/jobs"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaBriefcase />
-              Jobs
-            </Link>
+              <NavLink
+                to="/admin/users"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaUsers />
+                Users
+              </NavLink>
 
-            <Link
-              to="/admin/applications"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaFileAlt />
-              Applications
-            </Link>
-            <Link
-              to="/recruiter/candidates"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaUsers />
-              Candidates
-            </Link>
+              <NavLink
+                to="/admin/jobs"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaBriefcase />
+                Jobs
+              </NavLink>
 
-            <Link
-              to="/admin/analytics"
-              className="flex items-center gap-3 p-3 rounded hover:bg-blue-100"
-            >
-              <FaChartBar />
-              Analytics
-            </Link>
-          </>
-        )}
-      </nav>
-    </div>
+              <NavLink
+                to="/admin/applications"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaFileAlt />
+                Applications
+              </NavLink>
+              <NavLink
+                to="/recruiter/candidates"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaUsers />
+                Candidates
+              </NavLink>
+
+              <NavLink
+                to="/admin/analytics"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaChartBar />
+                Analytics
+              </NavLink>
+            </>
+          )}
+        </nav>
+      </div>
+    </>
   );
 }
 

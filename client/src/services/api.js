@@ -10,7 +10,7 @@ API.interceptors.request.use((req) => {
 
   if (userInfo) {
     const storedUser = JSON.parse(userInfo);
-    const token = storedUser.token || storedUser.toke;
+    const token = storedUser.token;
 
     if (token) {
       req.headers.Authorization = `Bearer ${token}`;
@@ -19,5 +19,18 @@ API.interceptors.request.use((req) => {
 
   return req;
 });
+
+// Handle 401/403 errors
+API.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // Clear invalid token and logout
+      localStorage.removeItem("userInfo");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);
 
 export default API;

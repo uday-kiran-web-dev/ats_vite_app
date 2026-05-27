@@ -30,10 +30,19 @@ const applicationSchema = new mongoose.Schema(
     coverLetter: {
       type: String,
     },
+    matchScore: {
+      type: Number,
+    },
     matchReport: {
       skillsMatch: [String],
 
       matchSkills: [String],
+
+      missingSkills: [String],
+
+      overallFit: {
+        type: String,
+      },
 
       experienceMatch: {
         type: String,

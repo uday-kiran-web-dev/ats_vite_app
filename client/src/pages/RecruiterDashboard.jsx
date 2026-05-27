@@ -7,7 +7,7 @@ function RecruiterDashboard() {
     <DashboardLayout>
       <h1 className="text-3xl font-bold mb-8">Recruiter Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-10">
         <Card title="Active Jobs" value="8" />
 
         <Card title="Applications" value="24" />

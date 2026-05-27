@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 function AdminDashboard() {
   return (
     <DashboardLayout>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col gap-4 justify-between items-start mb-8 md:flex-row md:items-center">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
         <Link
@@ -18,7 +18,7 @@ function AdminDashboard() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-10">
         <Card title="Users" value="120" />
 
         <Card title="Recruiters" value="18" />

@@ -51,7 +51,7 @@ function Register() {
       } else if (data.role === "Recruiter") {
         navigate("/recruiter");
       } else {
-        navigate("/dashboard");
+        navigate("/profile");
       }
     } catch (error) {
       setError(error.response?.data?.message || "Registration failed");
@@ -114,15 +114,7 @@ function Register() {
           onChange={handleChange}
         />
 
-        <select
-          name="role"
-          className="w-full p-3 border rounded mb-4"
-          onChange={handleChange}
-        >
-          <option value="Candidate">Candidate</option>
-
-          <option value="Recruiter">Recruiter</option>
-        </select>
+        <input type="hidden" name="role" value="Candidate" />
 
         <button
           type="submit"

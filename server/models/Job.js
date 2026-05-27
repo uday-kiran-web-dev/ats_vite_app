@@ -48,7 +48,18 @@ const jobSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 );
+
+jobSchema
+  .virtual("jobType")
+  .get(function () {
+    return this.jobTpye;
+  })
+  .set(function (value) {
+    this.jobTpye = value;
+  });
 
 module.exports = mongoose.model("Job", jobSchema);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
@@ -75,11 +76,11 @@ function Profile() {
         },
       });
 
-      alert("Profile Updated");
+      toast.success("Profile Updated");
 
       fetchProfile();
     } catch (error) {
-      alert(error.response?.data?.message || "Profile update failed");
+      toast.error(error.response?.data?.message || "Profile update failed");
     } finally {
       setLoading(false);
     }
