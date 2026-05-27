@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import DashboardLayout from "../layouts/DashboardLayout";
 import API from "../services/api";
+import { Fa0, FaTrashCan } from "react-icons/fa6";
+import { FaUserEdit } from "react-icons/fa";
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -190,38 +192,43 @@ function Users() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr key={user._id}>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {user.firstName} {user.lastName}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {user.email}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {user.role}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {user.phone || "-"}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleEdit(user)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(user._id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {users.map((user) => {
+                if (user.role === "Candidate") {
+                  return null; // Skip candidate users
+                }
+                return (
+                  <tr key={user._id}>
+                    <td className="px-4 py-3 text-sm text-gray-700">
+                      {user.firstName} {user.lastName}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">
+                      {user.email}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">
+                      {user.role}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">
+                      {user.phone || "-"}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleEdit(user)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded"
+                      >
+                        <FaUserEdit />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(user._id)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded"
+                      >
+                        <FaTrashCan />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           {!users.length && !loading && (

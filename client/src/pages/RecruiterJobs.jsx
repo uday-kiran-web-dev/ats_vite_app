@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 import API from "../services/api";
+import { FaTrashCan } from "react-icons/fa6";
+import { FaEdit } from "react-icons/fa";
 
 function RecruiterJobs() {
   const [jobs, setJobs] = useState([]);
@@ -423,9 +425,7 @@ function RecruiterJobs() {
                 <th className="px-4 py-3 text-sm font-semibold text-gray-700">
                   Status
                 </th>
-                <th className="px-4 py-3 text-sm font-semibold text-gray-700">
-                  Requirements
-                </th>
+
                 <th className="px-4 py-3 text-sm font-semibold text-gray-700">
                   Actions
                 </th>
@@ -454,37 +454,21 @@ function RecruiterJobs() {
                   <td className="px-4 py-3 text-sm text-gray-700 capitalize">
                     {job.status || "active"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    <div className="flex flex-wrap gap-2">
-                      {job.requirements?.slice(0, 4).map((skill, index) => (
-                        <span
-                          key={index}
-                          className="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                      {job.requirements?.length > 4 && (
-                        <span className="text-xs text-gray-500">
-                          +{job.requirements.length - 4} more
-                        </span>
-                      )}
-                    </div>
-                  </td>
+
                   <td className="px-4 py-3 text-sm text-gray-700 space-x-2">
                     <button
                       type="button"
                       onClick={() => startEdit(job)}
                       className="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600"
                     >
-                      Edit
+                      <FaEdit />
                     </button>
                     <button
                       type="button"
                       onClick={() => deleteJob(job._id)}
                       className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
                     >
-                      Delete
+                      <FaTrashCan />
                     </button>
                   </td>
                 </tr>

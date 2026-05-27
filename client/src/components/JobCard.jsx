@@ -1,31 +1,34 @@
-function JobCard({ job, onApply, showActions = false, onDelete, onEdit }) {
+import { Link } from "react-router-dom";
+
+function JobCard({ job, showActions = false, onDelete, onEdit }) {
+  const descriptionSnippet =
+    typeof job.description === "string"
+      ? job.description.split(" ").slice(0, 10).join(" ")
+      : "";
+
   return (
     <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
-      <h2 className="text-2xl font-bold mb-2">{job.title}</h2>
-      <p className="text-gray-600 mb-2">
-        {job.location} • {job.jobType}
+      <Link to={`/jobs/${job._id}`} className="text-2xl font-bold mb-2 block">
+        {job.title}
+      </Link>
+      <p className="text-gray-600 mb-4">
+        {job.location || "Location not specified"} •{" "}
+        {job.jobType || job.jobTpye || "Job type not set"}
       </p>
-      <p className="mb-4 text-gray-700">{job.description}</p>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {job.requirements?.map((skill, index) => (
-          <span
-            key={index}
-            className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm"
-          >
-            {skill}
-          </span>
-        ))}
-      </div>
+      {descriptionSnippet && (
+        <p className="mb-4 text-sm text-gray-700">
+          {descriptionSnippet}
+          {job.description.split(" ").length > 10 ? "..." : ""}
+        </p>
+      )}
 
-      <div className="flex gap-3 flex-wrap">
-        {onApply && (
-          <button
-            onClick={() => onApply(job._id)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Apply
-          </button>
-        )}
+      <div className="flex flex-wrap gap-3">
+        <Link
+          to={`/jobs/${job._id}`}
+          className="bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700"
+        >
+          Job Details
+        </Link>
 
         {showActions && (
           <>

@@ -17,6 +17,7 @@ import ApplicationDetails from "./pages/ApplicationDetails";
 import Profile from "./pages/Profile";
 import Candidates from "./pages/Candidates";
 import Analytics from "./pages/Analytics";
+import JobDetails from "./pages/JobDetails";
 
 function App() {
   const location = useLocation();
@@ -36,6 +37,7 @@ function App() {
         <Routes>
           {/* {Public routes} */}
           <Route path="/" element={<Jobs />} />
+          <Route path="/jobs/:id" element={<JobDetails />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
@@ -140,6 +142,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Admin"]}>
                 <Users />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/jobs"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <RecruiterJobs />
               </ProtectedRoute>
             }
           />
