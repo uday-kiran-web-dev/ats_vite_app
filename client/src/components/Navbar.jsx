@@ -4,6 +4,7 @@ import { FaBars, FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../context/AuthContext";
+import { FaComputer } from "react-icons/fa6";
 
 function Navbar({ onMenuClick }) {
   const { user, logout } = useContext(AuthContext);
@@ -40,6 +41,14 @@ function Navbar({ onMenuClick }) {
           <p className="text-sm text-slate-500">{user?.role}</p>
         </div>
       </div>
+      <div className="relative flex items-center gap-4">
+        <Link
+          to="/"
+          className="e-flex items-center gap-2 rounded-full border border-slate-200 bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Visit Website (Jobs)
+        </Link>
+      </div>
 
       <div className="relative flex items-center gap-4">
         <button
@@ -48,7 +57,9 @@ function Navbar({ onMenuClick }) {
           className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
         >
           <FaUserCircle className="h-5 w-5" />
-          <span className="hidden sm:inline">Account</span>
+          <span className="hidden sm:inline">
+            {user.firstName || "Account"}
+          </span>
         </button>
 
         {dropdownOpen && (

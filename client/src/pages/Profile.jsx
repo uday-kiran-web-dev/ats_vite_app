@@ -389,7 +389,7 @@ function Profile() {
           {profile?.resume && (
             <div className="mt-6">
               <a
-                href={`http://localhost:5000/${profile.resume}`}
+                href={`${import.meta.env.VITE_SERVER_PATH}/${profile.resume}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-600 underline"

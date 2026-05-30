@@ -242,11 +242,29 @@ function ApplicationDetails() {
                         {application.candidateId?.firstName}{" "}
                         {application.candidateId?.lastName}
                       </p>
+                      {userCanEdit && (
+                        <p>
+                          <button
+                            className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                            onClick={() =>
+                              navigate(
+                                `/recruiter/candidates/${application.profileId}`,
+                              )
+                            }
+                          >
+                            View Profile
+                          </button>
+                        </p>
+                      )}
+
                       <p>
                         <span className="font-semibold">Email:</span>{" "}
                         {application.candidateId?.email}
                       </p>
-                      {/* <p><span className="font-semibold">Phone:</span> {application.candidateId?.phone || "N/A"}</p> */}
+                      <p>
+                        <span className="font-semibold">Phone:</span>{" "}
+                        {application.candidateId?.phone || "N/A"}
+                      </p>
                     </div>
                   </div>
 
@@ -463,7 +481,7 @@ function ApplicationDetails() {
                     <p className="mt-5 text-sm text-gray-700">
                       <span className="font-semibold">Resume:</span>
                       <a
-                        href={`http://localhost:5000/${application.resume}`}
+                        href={`${import.meta.env.VITE_SERVER_PATH}/${application.resume}`}
                         target="_blank"
                         rel="noreferrer"
                         className="text-white bg-green-600 px-3 py-2 rounded "
@@ -474,7 +492,7 @@ function ApplicationDetails() {
                     {/* <p className="mt-5 text-sm text-gray-700">
                       <span className="font-semibold">Cover Letter:</span>
                       <a
-                        href={`http://localhost:5000/${application.coverLetter}`}
+                        href={`${import.meta.env.VITE_SERVER_PATH}/${application.coverLetter}`}
                         target="_blank"
                         rel="noreferrer"
                         className="text-white bg-green-600 px-3 py-2 rounded"

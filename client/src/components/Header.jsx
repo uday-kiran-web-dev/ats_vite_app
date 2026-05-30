@@ -31,16 +31,16 @@ function Header() {
         </Link>
 
         <div className="hidden items-center gap-4 md:flex">
-          <Link
-            to="/"
-            className="text-sm font-medium text-slate-600 hover:text-slate-900"
+          <a
+            href="/#available-jobs"
+            className="text-sm font-medium text-blue-600 hover:text-slate-900"
           >
             Jobs
-          </Link>
+          </a>
           {user && (
             <Link
               to={dashboardPath}
-              className="text-sm font-medium text-slate-600 hover:text-slate-900"
+              className="text-sm font-medium text-blue-600 hover:text-slate-900"
             >
               Dashboard
             </Link>

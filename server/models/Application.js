@@ -12,11 +12,16 @@ const applicationSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    profileId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+      required: true,
+    },
     status: {
       type: String,
       enum: [
         "applied",
-        "screened",
+        "screening",
         "interviewed",
         "offered",
         "hired",

@@ -13,6 +13,7 @@ import {
   FaHistory,
   FaTimes,
 } from "react-icons/fa";
+import { FaComputer } from "react-icons/fa6";
 
 function Sidebar({ isOpen = false, onClose = () => {} }) {
   const { user } = useContext(AuthContext);
@@ -60,22 +61,6 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
               >
                 <FaChartBar />
                 Dashboard
-              </NavLink>
-
-              <NavLink
-                to="/"
-                end
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 p-3 rounded ${
-                    isActive
-                      ? "bg-blue-100 text-blue-700 font-semibold"
-                      : "hover:bg-blue-100"
-                  }`
-                }
-              >
-                <FaBriefcase />
-                Jobs
               </NavLink>
 
               <NavLink
@@ -130,6 +115,21 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
                 <FaChartBar />
                 Dashboard
               </NavLink>
+              <NavLink
+                to="/recruiter/candidates"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaUsers />
+                Candidates
+              </NavLink>
 
               <NavLink
                 to="/recruiter/jobs"
@@ -162,21 +162,6 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
                 <FaFileAlt />
                 Applications
               </NavLink>
-              <NavLink
-                to="/recruiter/candidates"
-                end
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 p-3 rounded ${
-                    isActive
-                      ? "bg-blue-100 text-blue-700 font-semibold"
-                      : "hover:bg-blue-100"
-                  }`
-                }
-              >
-                <FaUsers />
-                Candidates
-              </NavLink>
 
               <NavLink
                 to="/profile"
@@ -192,22 +177,6 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
               >
                 <FaUserCircle />
                 Profile
-              </NavLink>
-
-              <NavLink
-                to="/admin/analytics"
-                end
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 p-3 rounded ${
-                    isActive
-                      ? "bg-blue-100 text-blue-700 font-semibold"
-                      : "hover:bg-blue-100"
-                  }`
-                }
-              >
-                <FaChartBar />
-                Analytics
               </NavLink>
             </>
           )}
@@ -246,7 +215,21 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
                 <FaUsers />
                 Users
               </NavLink>
-
+              <NavLink
+                to="/recruiter/candidates"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaUsers />
+                Candidates
+              </NavLink>
               <NavLink
                 to="/admin/jobs"
                 end
@@ -293,37 +276,6 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
                 <FaHistory />
                 User Logs
               </NavLink>
-              <NavLink
-                to="/recruiter/candidates"
-                end
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 p-3 rounded ${
-                    isActive
-                      ? "bg-blue-100 text-blue-700 font-semibold"
-                      : "hover:bg-blue-100"
-                  }`
-                }
-              >
-                <FaUsers />
-                Candidates
-              </NavLink>
-
-              <NavLink
-                to="/profile"
-                end
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 p-3 rounded ${
-                    isActive
-                      ? "bg-blue-100 text-blue-700 font-semibold"
-                      : "hover:bg-blue-100"
-                  }`
-                }
-              >
-                <FaUserCircle />
-                Profile
-              </NavLink>
 
               <NavLink
                 to="/admin/analytics"
@@ -339,6 +291,21 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
               >
                 <FaChartBar />
                 Analytics
+              </NavLink>
+              <NavLink
+                to="/profile"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaUserCircle />
+                Profile
               </NavLink>
             </>
           )}

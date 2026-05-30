@@ -42,6 +42,7 @@ const applyJob = async (req, res) => {
     // Get candidate profile
     const profile = await Profile.findOne({
       userId: req.user._id,
+      profileId: req.body._id,
     });
 
     if (!profile || !profile.resume) {
@@ -59,7 +60,7 @@ const applyJob = async (req, res) => {
 
     // Call Python analyzer
     const analysisResponse = await axios.post(
-      "http://127.0.0.1:8000/analyze-resume",
+      `${process.env.FILE_UPLOAD_PATH}`,
       formData,
       {
         headers: formData.getHeaders(),
@@ -101,6 +102,7 @@ const applyJob = async (req, res) => {
       jobId,
       candidateId: req.user._id,
       resume: profile.resume,
+      profileId: profile._id,
       coverLetter,
 
       matchScore: analysis.matchScore,
@@ -189,7 +191,7 @@ const getApplicationById = async (req, res) => {
   try {
     const application = await Application.findById(req.params.id)
       .populate("jobId")
-      .populate("candidateId", "firstName lastName email");
+      .populate("candidateId", "firstName lastName email phone");
 
     if (!application) {
       return res.status(404).json({
@@ -252,7 +254,7 @@ const updateApplicationStatus = async (req, res) => {
 const scheduleInterview = async (req, res) => {
   try {
     const application = await Application.findById(req.params.id)
-      .populate("candidateId", "firstName lastName email")
+      .populate("candidateId", "firstName lastName email phone")
       .populate("jobId", "title");
 
     if (!application) {

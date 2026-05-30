@@ -59,8 +59,11 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"
+        className="bg-white p-10 rounded-lg shadow-md w-full max-w-md"
       >
+        <p className="text-lg text-red-500 mb-4 w-full max-w-md text-center">
+          Please login to Access Dashboard / Jobs
+        </p>
         <h2 className="text-3xl font-bold mb-6 text-center">Login</h2>
 
         {error && <p className="text-red-500 mb-4">{error}</p>}

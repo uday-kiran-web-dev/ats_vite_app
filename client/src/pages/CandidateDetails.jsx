@@ -427,7 +427,7 @@ function CandidateDetails() {
                         {profile.resume ? (
                           <p>
                             <a
-                              href={`http://localhost:5000/${profile.resume}`}
+                              href={`${import.meta.env.VITE_SERVER_PATH}/${profile.resume}`}
                               target="_blank"
                               rel="noreferrer"
                               className="text-green-600 underline"

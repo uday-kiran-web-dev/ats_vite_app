@@ -35,12 +35,12 @@ export default function Hero() {
               >
                 Browse jobs
               </a>
-              <a
+              {/* <a
                 href="#about"
                 className="text-sm font-semibold text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300"
               >
                 Learn how it works <span aria-hidden="true">→</span>
-              </a>
+              </a> */}
             </div>
           </div>
         </div>
