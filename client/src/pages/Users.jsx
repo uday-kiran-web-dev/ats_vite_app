@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import DashboardLayout from "../layouts/DashboardLayout";
 import API from "../services/api";
-import { Fa0, FaTrashCan } from "react-icons/fa6";
+import { FaEye, FaTrashCan } from "react-icons/fa6";
 import { FaUserEdit } from "react-icons/fa";
 
 function Users() {
@@ -16,12 +17,17 @@ function Users() {
     email: "",
     role: "Candidate",
     phone: "",
+    isActive: true,
   });
 
   const fetchUsers = async () => {
     try {
       const { data } = await API.get("/users");
-      setUsers(data);
+      // Sort by newest first
+      const sorted = [...data].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
+      setUsers(sorted);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load users.");
     } finally {
@@ -36,11 +42,12 @@ function Users() {
   const handleEdit = (user) => {
     setEditingUser(user);
     setFormData({
-      firstName: user.firstName || "",
-      lastName: user.lastName || "",
-      email: user.email || "",
-      role: user.role || "Candidate",
-      phone: user.phone || "",
+      firstName: user.firstName ?? "",
+      lastName: user.lastName ?? "",
+      email: user.email ?? "",
+      role: user.role ?? "Candidate",
+      phone: user.phone ?? "",
+      isActive: user.isActive ?? true,
     });
   };
 
@@ -56,9 +63,10 @@ function Users() {
   };
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: name === "isActive" ? value === "active" : value,
     });
   };
 
@@ -93,8 +101,14 @@ function Users() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-3xl font-bold">User Management</h1>
+          <Link
+            to="/admin/users/add"
+            className="inline-flex items-center rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          >
+            Add User
+          </Link>
         </div>
 
         {loading && <p>Loading users...</p>}
@@ -152,6 +166,15 @@ function Users() {
                 <option value="Recruiter">Recruiter</option>
                 <option value="Candidate">Candidate</option>
               </select>
+              <select
+                name="isActive"
+                value={formData.isActive ? "active" : "inactive"}
+                onChange={handleChange}
+                className="border p-3 rounded"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
               <input
                 name="phone"
                 value={formData.phone}
@@ -187,6 +210,9 @@ function Users() {
                   Phone
                 </th>
                 <th className="px-4 py-3 text-sm font-semibold text-gray-700">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-sm font-semibold text-gray-700">
                   Actions
                 </th>
               </tr>
@@ -210,7 +236,16 @@ function Users() {
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {user.phone || "-"}
                     </td>
+                    <td className="px-4 py-3 text-sm text-gray-700 capitalize">
+                      {user.isActive ? "Active" : "Inactive"}
+                    </td>
                     <td className="px-4 py-3 text-sm text-gray-700 flex flex-wrap gap-2">
+                      <Link
+                        to={`/admin/users/${user._id}`}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded"
+                      >
+                        <FaEye />
+                      </Link>
                       <button
                         type="button"
                         onClick={() => handleEdit(user)}

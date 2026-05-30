@@ -7,3 +7,39 @@ body {
   font-family: sans-serif;
   background-color: #f3f4f6;
 }
+
+.prose,
+.rich-text-content {
+  word-break: break-word;
+}
+
+.prose ul,
+.prose ol,
+.rich-text-content ul,
+.rich-text-content ol {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.prose ul {
+  list-style-type: disc;
+}
+
+.prose ol {
+  list-style-type: decimal;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+}
+
+.prose li,
+.rich-text-content li {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}

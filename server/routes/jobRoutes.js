@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   createJob,
   getJobs,
+  getJobsForUser,
   getJobById,
   updateJob,
   deleteJob,
@@ -16,6 +17,12 @@ const authorizeRoles = require("../middleware/roleMiddleware");
 
 //Public routes
 router.get("/", getJobs);
+router.get(
+  "/my-jobs",
+  protect,
+  authorizeRoles("Admin", "Recruiter"),
+  getJobsForUser,
+);
 
 router.get("/:id", getJobById);
 

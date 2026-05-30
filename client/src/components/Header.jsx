@@ -70,15 +70,13 @@ function Header() {
                   >
                     Dashboard
                   </Link>
-                  {user.role === "Candidate" && (
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-3 text-sm text-slate-700 hover:bg-slate-50"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      Profile
-                    </Link>
-                  )}
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-3 text-sm text-slate-700 hover:bg-slate-50"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    Profile
+                  </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
@@ -119,13 +117,22 @@ function Header() {
             Jobs
           </Link>
           {user && (
-            <Link
-              to={dashboardPath}
-              className="mt-1 block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-              onClick={() => setMobileOpen(false)}
-            >
-              Dashboard
-            </Link>
+            <>
+              <Link
+                to={dashboardPath}
+                className="mt-1 block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                onClick={() => setMobileOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/profile"
+                className="mt-1 block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                onClick={() => setMobileOpen(false)}
+              >
+                Profile
+              </Link>
+            </>
           )}
           {user ? (
             <button

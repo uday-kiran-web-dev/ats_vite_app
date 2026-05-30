@@ -1,10 +1,15 @@
 import { Link } from "react-router-dom";
 
+const getPlainText = (text) =>
+  text
+    ?.replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim() || "";
+
 function JobCard({ job, showActions = false, onDelete, onEdit }) {
-  const descriptionSnippet =
-    typeof job.description === "string"
-      ? job.description.split(" ").slice(0, 10).join(" ")
-      : "";
+  const snippetSource = getPlainText(job.description);
+  const descriptionWords = snippetSource.split(" ").filter(Boolean);
+  const descriptionSnippet = descriptionWords.slice(0, 10).join(" ");
 
   return (
     <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
@@ -18,7 +23,7 @@ function JobCard({ job, showActions = false, onDelete, onEdit }) {
       {descriptionSnippet && (
         <p className="mb-4 text-sm text-gray-700">
           {descriptionSnippet}
-          {job.description.split(" ").length > 10 ? "..." : ""}
+          {descriptionWords.length > 10 ? "..." : ""}
         </p>
       )}
 

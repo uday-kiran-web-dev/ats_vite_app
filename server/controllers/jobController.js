@@ -37,10 +37,39 @@ const createJob = async (req, res) => {
 //Get all jobs
 const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({ status: "active" }).populate(
+    const jobs = await Job.find().populate(
       "recruiterId",
       "firstName lastName email",
     );
+
+    return res.status(200).json(jobs);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+//Get jobs for recruiter or admin
+const getJobsForUser = async (req, res) => {
+  try {
+    let jobs;
+
+    if (req.user.role === "Recruiter") {
+      jobs = await Job.find({ recruiterId: req.user._id }).populate(
+        "recruiterId",
+        "firstName lastName email",
+      );
+    } else if (req.user.role === "Admin") {
+      jobs = await Job.find().populate(
+        "recruiterId",
+        "firstName lastName email",
+      );
+    } else {
+      return res.status(403).json({
+        message: "User not authorized to access this resource",
+      });
+    }
 
     return res.status(200).json(jobs);
   } catch (error) {
@@ -146,6 +175,7 @@ const deleteJob = async (req, res) => {
 module.exports = {
   createJob,
   getJobs,
+  getJobsForUser,
   getJobById,
   updateJob,
   deleteJob,

@@ -24,11 +24,17 @@ API.interceptors.request.use((req) => {
 API.interceptors.response.use(
   (res) => res,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      // Clear invalid token and logout
+    const status = error.response?.status;
+    const requestUrl = error.config?.url || "";
+
+    const isAuthLoginRequest = requestUrl.includes("/auth/login");
+
+    if ((status === 401 || status === 403) && !isAuthLoginRequest) {
+      // Clear invalid token and logout for requests other than login
       localStorage.removeItem("userInfo");
       window.location.href = "/login";
     }
+
     return Promise.reject(error);
   },
 );

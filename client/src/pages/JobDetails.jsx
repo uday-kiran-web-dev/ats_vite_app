@@ -7,6 +7,7 @@ const JobDetails = () => {
   const { id } = useParams();
 
   const [job, setJob] = useState(null);
+  const [hasApplied, setHasApplied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
@@ -26,6 +27,28 @@ const JobDetails = () => {
   useEffect(() => {
     fetchJob();
   }, [id]);
+
+  useEffect(() => {
+    const fetchApplicationStatus = async () => {
+      if (!job?._id) return;
+
+      try {
+        const { data } = await API.get("/applications");
+        if (!Array.isArray(data)) return;
+
+        const applied = data.some((application) => {
+          const applicationJobId = application.jobId?._id || application.jobId;
+          return applicationJobId === job._id;
+        });
+
+        setHasApplied(applied);
+      } catch (err) {
+        console.error("Unable to verify application status", err);
+      }
+    };
+
+    fetchApplicationStatus();
+  }, [job]);
 
   return (
     <div className="relative isolate overflow-hidden bg-white px-6 py-24 sm:py-32 lg:overflow-visible lg:px-0 dark:bg-gray-900">
@@ -54,11 +77,11 @@ const JobDetails = () => {
                   <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
                     {job.jobType || job.jobTpye || "Job type not set"}
                   </span>
-                  <span
+                  {/* <span
                     className={`rounded-full px-3 py-1 text-sm ${job.status === "closed" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200" : job.status === "draft" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-200" : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-200"}`}
                   >
                     {job.status || "active"}
-                  </span>
+                  </span> */}
                 </div>
               </div>
 
@@ -70,14 +93,20 @@ const JobDetails = () => {
                   <p className="mt-3 text-xl font-semibold text-slate-900 dark:text-white">
                     {new Date(job.createdAt).toLocaleDateString()}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirm(true)}
-                    className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                    disabled={job.status === "closed"}
-                  >
-                    {job.status === "closed" ? "Closed" : "Apply"}
-                  </button>
+                  {hasApplied ? (
+                    <span className="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-red-500 px-4 py-3 text-center text-sm font-semibold text-white">
+                      Applied
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm(true)}
+                      className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                      disabled={job.status === "closed"}
+                    >
+                      {job.status === "closed" ? "Closed" : "Apply"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -88,9 +117,10 @@ const JobDetails = () => {
                   <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
                     About this role
                   </h2>
-                  <p className="mt-4 text-gray-700 dark:text-gray-300 justify-between text-justify">
-                    {job.description}
-                  </p>
+                  <div
+                    className="mt-4 text-gray-700 dark:text-gray-300 prose prose-slate dark:prose-invert max-w-none rich-text-content"
+                    dangerouslySetInnerHTML={{ __html: job.description || "" }}
+                  />
                 </section>
 
                 {job.requirements?.length > 0 && (
@@ -204,6 +234,7 @@ const JobDetails = () => {
                       skills: job.requirements || [],
                     });
                     toast.success("Application submitted successfully.");
+                    setHasApplied(true);
                     setShowConfirm(false);
                   } catch (err) {
                     toast.error(

@@ -8,6 +8,13 @@ const Profile = require("../models/Profile");
 const Application = require("../models/Application");
 const Job = require("../models/Job");
 const calculateMatch = require("../services/matchingService");
+const {
+  sendEmail,
+  applicationSubmittedTemplate,
+  recruiterNewApplicationTemplate,
+  applicationStatusUpdateTemplate,
+  interviewScheduledTemplate,
+} = require("../services/emailService");
 
 //Applying for a job
 const applyJob = async (req, res) => {
@@ -21,7 +28,10 @@ const applyJob = async (req, res) => {
     }
 
     // Checking if job exists
-    const job = await Job.findById(jobId);
+    const job = await Job.findById(jobId).populate(
+      "recruiterId",
+      "firstName lastName email",
+    );
 
     if (!job) {
       return res.status(404).json({
@@ -101,6 +111,37 @@ const applyJob = async (req, res) => {
         overallFit: analysis.recommendation,
       },
     });
+
+    try {
+      const candidateMail = applicationSubmittedTemplate(req.user, job);
+      await sendEmail({
+        to: req.user.email,
+        subject: candidateMail.subject,
+        html: candidateMail.html,
+        text: candidateMail.text,
+      });
+    } catch (emailError) {
+      console.error("Candidate application email failed", emailError);
+    }
+
+    if (job.recruiterId?.email) {
+      try {
+        const recruiterMail = recruiterNewApplicationTemplate(
+          job.recruiterId,
+          req.user,
+          job,
+        );
+        await sendEmail({
+          to: job.recruiterId.email,
+          subject: recruiterMail.subject,
+          html: recruiterMail.html,
+          text: recruiterMail.text,
+        });
+      } catch (emailError) {
+        console.error("Recruiter notification email failed", emailError);
+      }
+    }
+
     return res.status(201).json(application);
   } catch (error) {
     return res.status(500).json({
@@ -114,15 +155,22 @@ const getApplications = async (req, res) => {
   try {
     let applications;
 
-    //Candidate sees own applications
     if (req.user.role === "Candidate") {
       applications = await Application.find({
         candidateId: req.user._id,
       })
         .populate("jobId")
         .populate("candidateId", "firstName lastName email phone");
+    } else if (req.user.role === "Recruiter") {
+      const jobs = await Job.find({ recruiterId: req.user._id }, "_id");
+      const jobIds = jobs.map((job) => job._id);
+
+      applications = await Application.find({
+        jobId: { $in: jobIds },
+      })
+        .populate("jobId")
+        .populate("candidateId", "firstName lastName email phone");
     } else {
-      //Recruiter/Admin can see all applications
       applications = await Application.find()
         .populate("jobId")
         .populate("candidateId", "firstName lastName email phone");
@@ -159,17 +207,38 @@ const getApplicationById = async (req, res) => {
 //Update application status
 const updateApplicationStatus = async (req, res) => {
   try {
-    const application = await Application.findByIdAndUpdate(req.params.id);
+    const application = await Application.findById(req.params.id)
+      .populate("candidateId", "firstName lastName email")
+      .populate("jobId", "title");
 
     if (!application) {
       return res.status(404).json({
         message: "Application not found",
       });
     }
+
     application.status = req.body.status || application.status;
     application.feedback = req.body.feedback ?? application.feedback;
 
     await application.save();
+
+    if (application.candidateId?.email) {
+      try {
+        const mail = applicationStatusUpdateTemplate(
+          application.candidateId,
+          application,
+          application.status,
+        );
+        await sendEmail({
+          to: application.candidateId.email,
+          subject: mail.subject,
+          html: mail.html,
+          text: mail.text,
+        });
+      } catch (emailError) {
+        console.error("Application status email failed", emailError);
+      }
+    }
 
     return res.json(application);
   } catch (error) {
@@ -182,7 +251,9 @@ const updateApplicationStatus = async (req, res) => {
 //Schedule interviews
 const scheduleInterview = async (req, res) => {
   try {
-    const application = await Application.findById(req.params.id);
+    const application = await Application.findById(req.params.id)
+      .populate("candidateId", "firstName lastName email")
+      .populate("jobId", "title");
 
     if (!application) {
       return res.status(404).json({
@@ -198,6 +269,23 @@ const scheduleInterview = async (req, res) => {
     };
 
     await application.save();
+
+    if (application.candidateId?.email) {
+      try {
+        const mail = interviewScheduledTemplate(
+          application.candidateId,
+          application,
+        );
+        await sendEmail({
+          to: application.candidateId.email,
+          subject: mail.subject,
+          html: mail.html,
+          text: mail.text,
+        });
+      } catch (emailError) {
+        console.error("Interview scheduled email failed", emailError);
+      }
+    }
 
     return res.json(application);
   } catch (error) {

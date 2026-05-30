@@ -8,9 +8,8 @@ import Hero from "../components/Hero";
 
 function Jobs() {
   const [jobs, setJobs] = useState([]);
-
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
   // Fetch jobs
@@ -47,6 +46,24 @@ function Jobs() {
     }
   };
 
+  const filteredJobs = jobs.filter((job) => {
+    if (job.status !== "active") return false;
+    if (!searchQuery.trim()) return true;
+
+    const query = searchQuery.toLowerCase();
+    const title = job.title?.toLowerCase() || "";
+    const company = job.company?.toLowerCase() || "";
+    const location = job.location?.toLowerCase() || "";
+    const description = job.description?.toLowerCase() || "";
+
+    return (
+      title.includes(query) ||
+      company.includes(query) ||
+      location.includes(query) ||
+      description.includes(query)
+    );
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950">
       <Hero />
@@ -73,10 +90,30 @@ function Jobs() {
 
           {error && <p className="text-center text-red-500">{error}</p>}
 
+          <div className="mb-6">
+            <label htmlFor="job-search" className="sr-only">
+              Search jobs
+            </label>
+            <input
+              id="job-search"
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by title, company, or location"
+              className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-slate-500 dark:focus:ring-slate-800"
+            />
+          </div>
+
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {jobs.map((job) => (
-              <JobCard key={job._id} job={job} />
-            ))}
+            {filteredJobs.length === 0 ? (
+              <p className="col-span-full text-center text-slate-600 dark:text-slate-300">
+                No matching jobs found.
+              </p>
+            ) : (
+              filteredJobs.map((job) => (
+                <JobCard key={job._id} job={job} onApply={applyToJob} />
+              ))
+            )}
           </div>
         </div>
       </main>

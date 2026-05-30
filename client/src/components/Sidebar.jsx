@@ -10,6 +10,7 @@ import {
   FaChartBar,
   FaFileAlt,
   FaUserCircle,
+  FaHistory,
   FaTimes,
 } from "react-icons/fa";
 
@@ -178,6 +179,22 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
               </NavLink>
 
               <NavLink
+                to="/profile"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaUserCircle />
+                Profile
+              </NavLink>
+
+              <NavLink
                 to="/admin/analytics"
                 end
                 onClick={onClose}
@@ -262,6 +279,21 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
                 Applications
               </NavLink>
               <NavLink
+                to="/admin/user-logs"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaHistory />
+                User Logs
+              </NavLink>
+              <NavLink
                 to="/recruiter/candidates"
                 end
                 onClick={onClose}
@@ -275,6 +307,22 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
               >
                 <FaUsers />
                 Candidates
+              </NavLink>
+
+              <NavLink
+                to="/profile"
+                end
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 p-3 rounded ${
+                    isActive
+                      ? "bg-blue-100 text-blue-700 font-semibold"
+                      : "hover:bg-blue-100"
+                  }`
+                }
+              >
+                <FaUserCircle />
+                Profile
               </NavLink>
 
               <NavLink

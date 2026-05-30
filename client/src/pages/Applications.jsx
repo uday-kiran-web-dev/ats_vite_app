@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext, Fragment } from "react";
 import { Link } from "react-router-dom";
+import { FaEye } from "react-icons/fa6";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -31,8 +32,11 @@ function Applications() {
   const fetchApplications = async () => {
     try {
       const { data } = await API.get("/applications");
-
-      setApplications(data);
+      // Sort by newest first
+      const sorted = [...data].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
+      setApplications(sorted);
     } catch (error) {
       setError("Failed to load applications");
     } finally {
@@ -164,9 +168,10 @@ function Applications() {
                       <div className="flex flex-wrap gap-2">
                         <Link
                           to={getDetailsPath(app._id)}
-                          className="bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700"
+                          title="View Details"
+                          className="inline-flex items-center justify-center rounded bg-gray-600 p-3 text-white hover:bg-gray-700"
                         >
-                          View Details
+                          <FaEye className="h-4 w-4" />
                         </Link>
                       </div>
                     </td>

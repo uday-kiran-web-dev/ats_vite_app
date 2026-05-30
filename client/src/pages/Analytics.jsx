@@ -37,7 +37,6 @@ function Analytics() {
 
       setPipeline(pipelineRes.data);
     } catch (error) {
-      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -46,6 +45,47 @@ function Analytics() {
   useEffect(() => {
     fetchAnalytics();
   }, []);
+
+  const downloadCSV = (csvContent, filename) => {
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportCSV = () => {
+    const rows = [
+      ["Metric", "Value"],
+      ["Total Users", overview.totalUsers],
+      ["Total Jobs", overview.totalJobs],
+      ["Applications", overview.totalApplications],
+      ["Hired", overview.hiredCandidates],
+      ["Total Candidates", overview.totalCandidates],
+      ["Total Recruiters", overview.totalRecruiters],
+      ["Active Jobs", overview.activeJobs],
+      [],
+      ["Pipeline Stage", "Count"],
+      ["Applied", pipeline.applied],
+      ["Screened", pipeline.screened],
+      ["Interviewed", pipeline.interviewed],
+      ["Offered", pipeline.offered],
+      ["Hired", pipeline.hired],
+      ["Rejected", pipeline.rejected],
+    ];
+
+    const csvContent = rows
+      .map((row) =>
+        row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+      )
+      .join("\r\n");
+
+    downloadCSV(csvContent, "analytics-report.csv");
+  };
 
   if (loading) {
     return (
@@ -114,7 +154,16 @@ function Analytics() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-3xl font-bold mb-8">Analytics Dashboard</h1>
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
+        <button
+          type="button"
+          onClick={handleExportCSV}
+          className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+        >
+          Export CSV
+        </button>
+      </div>
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">

@@ -25,9 +25,30 @@ const userSchema = new mongoose.Schema(
       enum: ["Admin", "Recruiter", "Candidate"],
       required: true,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     phone: {
       type: String,
     },
+    loginCount: {
+      type: Number,
+      default: 0,
+    },
+    lastLogin: {
+      type: Date,
+    },
+    loginHistory: [
+      {
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
+        ip: String,
+        userAgent: String,
+      },
+    ],
   },
   { timestamps: true },
 );

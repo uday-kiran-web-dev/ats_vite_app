@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { Editor } from "@tinymce/tinymce-react";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
 import API from "../services/api";
-import { FaTrashCan } from "react-icons/fa6";
+import { FaTrashCan, FaPowerOff } from "react-icons/fa6";
 import { FaEdit } from "react-icons/fa";
 
 function RecruiterJobs() {
@@ -35,14 +36,29 @@ function RecruiterJobs() {
     status: "active",
   });
 
+  const editorInit = {
+    height: 500,
+    menubar: "file edit view insert format tools table help",
+    plugins:
+      "advlist autolink lists link image charmap print preview anchor " +
+      "searchreplace visualblocks code fullscreen insertdatetime media table " +
+      "paste code help wordcount",
+    toolbar:
+      "undo redo | formatselect | bold italic underline | " +
+      "alignleft aligncenter alignright alignjustify | " +
+      "bullist numlist outdent indent | removeformat | help",
+  };
+
   // Fetch jobs
   const fetchJobs = async () => {
     try {
-      const { data } = await API.get("/jobs");
-      setJobs(data);
-    } catch (error) {
-      console.log(error);
-    }
+      const { data } = await API.get("/jobs/my-jobs");
+      // Sort by newest first
+      const sorted = [...data].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
+      setJobs(sorted);
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -68,15 +84,15 @@ function RecruiterJobs() {
     setEditingJob(job);
     setShowAddForm(false);
     setEditFormData({
-      title: job.title || "",
-      description: job.description || "",
-      requirements: (job.requirements || []).join(","),
-      department: job.department || "",
-      location: job.location || "",
-      jobType: job.jobType || job.jobTpye || "full-time",
-      salaryMin: job.salary?.min || "",
-      salaryMax: job.salary?.max || "",
-      status: job.status || "active",
+      title: job.title ?? "",
+      description: job.description ?? "",
+      requirements: (job.requirements ?? []).join(","),
+      department: job.department ?? "",
+      location: job.location ?? "",
+      jobType: job.jobType ?? "full-time",
+      salaryMin: job.salary?.min ?? "",
+      salaryMax: job.salary?.max ?? "",
+      status: job.status ?? "active",
     });
   };
 
@@ -103,6 +119,14 @@ function RecruiterJobs() {
   // Create job
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (
+      !formData.description ||
+      !formData.description.replace(/<(.|\n)*?>/g, "").trim()
+    ) {
+      toast.error("Job description is required.");
+      return;
+    }
 
     try {
       await API.post("/jobs/create-job", {
@@ -138,6 +162,14 @@ function RecruiterJobs() {
 
     if (!editingJob) return;
 
+    if (
+      !editFormData.description ||
+      !editFormData.description.replace(/<(.|\n)*?>/g, "").trim()
+    ) {
+      toast.error("Job description is required.");
+      return;
+    }
+
     try {
       await API.put(`/jobs/update-job/${editingJob._id}`, {
         ...editFormData,
@@ -161,8 +193,23 @@ function RecruiterJobs() {
     try {
       await API.delete(`/jobs/delete-job/${id}`);
       fetchJobs();
+    } catch (error) {}
+  };
+
+  const toggleJobStatus = async (job) => {
+    try {
+      const newStatus = job.status === "active" ? "closed" : "active";
+      await API.put(`/jobs/update-job/${job._id}`, {
+        status: newStatus,
+      });
+      toast.success(
+        `Job ${newStatus === "active" ? "activated" : "deactivated"}`,
+      );
+      fetchJobs();
     } catch (error) {
-      console.log(error);
+      toast.error(
+        error.response?.data?.message || "Failed to update job status",
+      );
     }
   };
 
@@ -268,15 +315,27 @@ function RecruiterJobs() {
               />
             </div>
 
-            <textarea
-              name="description"
-              placeholder="Job Description"
-              className="border p-3 rounded w-full mt-4"
-              rows="5"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
+            {/* <div className="mt-4">
+              <label className="block mb-2 font-medium">Job Description</label>
+              <textarea
+                name="description"
+                rows="6"
+                className="w-full border p-3 rounded"
+                value={formData.description}
+                onChange={handleChange}
+                required
+              />
+            </div> */}
+            <div className="mt-4">
+              <label className="block mb-2 font-medium">Job Description</label>
+              <Editor
+                value={formData.description}
+                init={editorInit}
+                onEditorChange={(content) =>
+                  setFormData((prev) => ({ ...prev, description: content }))
+                }
+              />
+            </div>
 
             <button
               type="submit"
@@ -384,15 +443,17 @@ function RecruiterJobs() {
               />
             </div>
 
-            <textarea
-              name="description"
-              placeholder="Job Description"
-              className="border p-3 rounded w-full mt-4"
-              rows="5"
-              value={editFormData.description}
-              onChange={handleEditChange}
-              required
-            />
+            <div className="mt-4">
+              <label className="block mb-2 font-medium">Job Description</label>
+              <Editor
+                apiKey="bfm6ejrkogrl8t2p5zz8hnouuzrpjv7mtu3804lx8h09sgta"
+                value={editFormData.description}
+                init={editorInit}
+                onEditorChange={(content) =>
+                  setEditFormData((prev) => ({ ...prev, description: content }))
+                }
+              />
+            </div>
 
             <button
               type="submit"
@@ -459,14 +520,28 @@ function RecruiterJobs() {
                     <button
                       type="button"
                       onClick={() => startEdit(job)}
-                      className="bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600"
+                      title="Edit Job"
+                      className="bg-yellow-500 text-white p-3 rounded hover:bg-yellow-600"
                     >
                       <FaEdit />
                     </button>
                     <button
                       type="button"
+                      onClick={() => toggleJobStatus(job)}
+                      title={
+                        job.status === "active"
+                          ? "Deactivate Job"
+                          : "Activate Job"
+                      }
+                      className="bg-slate-600 text-white p-3 rounded hover:bg-slate-700"
+                    >
+                      <FaPowerOff />
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => deleteJob(job._id)}
-                      className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600"
+                      title="Delete Job"
+                      className="bg-red-500 text-white p-3 rounded hover:bg-red-600"
                     >
                       <FaTrashCan />
                     </button>

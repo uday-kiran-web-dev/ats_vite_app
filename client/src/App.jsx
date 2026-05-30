@@ -10,14 +10,19 @@ import CandidateDashboard from "./pages/CandidateDashboard";
 import RecruiterDashboard from "./pages/RecruiterDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Users from "./pages/Users";
+import UserDetails from "./pages/UserDetails";
+import UserLogs from "./pages/UserLogs";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import RecruiterJobs from "./pages/RecruiterJobs";
 import Applications from "./pages/Applications";
 import ApplicationDetails from "./pages/ApplicationDetails";
+import CandidateDetails from "./pages/CandidateDetails";
+import AddCandidate from "./pages/AddCandidate";
 import Profile from "./pages/Profile";
 import Candidates from "./pages/Candidates";
 import Analytics from "./pages/Analytics";
 import JobDetails from "./pages/JobDetails";
+import AddUser from "./pages/AddUser";
 
 function App() {
   const location = useLocation();
@@ -69,7 +74,9 @@ function App() {
           <Route
             path="/profile"
             element={
-              <ProtectedRoute allowedRoles={["Candidate"]}>
+              <ProtectedRoute
+                allowedRoles={["Candidate", "Recruiter", "Admin"]}
+              >
                 <Profile />
               </ProtectedRoute>
             }
@@ -118,6 +125,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/recruiter/candidates/add"
+            element={
+              <ProtectedRoute allowedRoles={["Recruiter", "Admin"]}>
+                <AddCandidate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recruiter/candidates/:id"
+            element={
+              <ProtectedRoute allowedRoles={["Recruiter", "Admin"]}>
+                <CandidateDetails />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/admin/analytics"
@@ -142,6 +165,32 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Admin"]}>
                 <Users />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/users/add"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AddUser />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/user-logs"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <UserLogs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users/:id"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <UserDetails />
               </ProtectedRoute>
             }
           />

@@ -17,7 +17,7 @@ function Login() {
     phone: "",
   });
 
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => {

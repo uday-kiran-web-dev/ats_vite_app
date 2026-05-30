@@ -9,31 +9,61 @@ import Card from "../components/Card";
 function CandidateDashboard() {
   const [profileComplete, setProfileComplete] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [applications, setApplications] = useState([]);
+  const [dashboardData, setDashboardData] = useState({
+    applications: 0,
+    interviews: 0,
+    offers: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       try {
-        const { data } = await API.get("/profiles/me");
-
+        // Fetch profile
+        const profileRes = await API.get("/profiles/me");
         const isComplete = [
-          data.skills,
-          data.experience,
-          data.education,
-          data.bio,
-          data.linkedin,
-          data.portfolio,
+          profileRes.data.skills,
+          profileRes.data.experience,
+          profileRes.data.education,
+          profileRes.data.bio,
+          profileRes.data.linkedin,
+          profileRes.data.portfolio,
         ].every((value) => value && value.toString().trim().length > 0);
-
         setProfileComplete(isComplete);
+
+        // Fetch applications
+        const appRes = await API.get("/applications");
+        setApplications(appRes.data);
+
+        // Calculate dashboard stats
+        const totalApplications = appRes.data.length;
+        const interviews = appRes.data.filter(
+          (app) => app.status === "interviewed",
+        ).length;
+        const offers = appRes.data.filter(
+          (app) => app.status === "offered",
+        ).length;
+
+        setDashboardData({
+          applications: totalApplications,
+          interviews: interviews,
+          offers: offers,
+        });
       } catch (error) {
-        setProfileComplete(false);
       } finally {
         setProfileLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchProfile();
+    fetchData();
   }, []);
+
+  const recentActivities = applications
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5)
+    .map((app) => `Applied for ${app.jobId?.title || "a job"}`);
 
   return (
     <DashboardLayout>
@@ -59,25 +89,32 @@ function CandidateDashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-10">
-        <Card title="Applications" value="12" />
+      {loading ? (
+        <p>Loading dashboard data...</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-10">
+            <Card title="Applications" value={dashboardData.applications} />
+            <Card title="Interviews" value={dashboardData.interviews} />
+            <Card title="Offers" value={dashboardData.offers} />
+          </div>
 
-        <Card title="Interviews" value="3" />
-
-        <Card title="Offers" value="1" />
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-bold mb-4">Recent Activity</h2>
-
-        <ul className="space-y-4">
-          <li className="border-b pb-3">Applied for Frontend Developer</li>
-
-          <li className="border-b pb-3">Interview scheduled with ABC Corp</li>
-
-          <li>Offer received from Tech Solutions</li>
-        </ul>
-      </div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-2xl font-bold mb-4">Recent Applications</h2>
+            <ul className="space-y-3">
+              {recentActivities.length > 0 ? (
+                recentActivities.map((activity, idx) => (
+                  <li key={idx} className="border-b pb-2 text-sm text-gray-700">
+                    {activity}
+                  </li>
+                ))
+              ) : (
+                <li className="text-gray-500">No applications yet</li>
+              )}
+            </ul>
+          </div>
+        </>
+      )}
     </DashboardLayout>
   );
 }

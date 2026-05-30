@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { model } = require("mongoose");
+const { sendEmail, welcomeTemplate } = require("../services/emailService");
 
 //Generate JWT Token
 const generateToken = (id) => {
@@ -38,6 +39,19 @@ const registerUser = async (req, res) => {
       phone,
     });
 
+    // Fire welcome email
+    try {
+      const mail = welcomeTemplate(user);
+      await sendEmail({
+        to: user.email,
+        subject: mail.subject,
+        html: mail.html,
+        text: mail.text,
+      });
+    } catch (emailError) {
+      console.error("Welcome email failed", emailError);
+    }
+
     //Return Response
     res.status(201).json({
       _id: user._id,
@@ -45,6 +59,7 @@ const registerUser = async (req, res) => {
       lastName: user.lastName,
       email: user.email,
       role: user.role,
+      isActive: user.isActive,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -64,8 +79,28 @@ const loginUser = async (req, res) => {
     //Check user exists or not
     const user = await User.findOne({ email });
 
+    if (!user) {
+      return res.status(401).json({ message: "Invalid Email or Password" });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({ message: "User account is inactive." });
+    }
+
     //Check password
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (await bcrypt.compare(password, user.password)) {
+      const loginEvent = {
+        timestamp: new Date(),
+        ip: req.ip,
+        userAgent: req.headers["user-agent"] || "",
+      };
+
+      user.loginHistory = user.loginHistory || [];
+      user.loginHistory.push(loginEvent);
+      user.lastLogin = new Date();
+      user.loginCount = (user.loginCount || 0) + 1;
+      await user.save();
+
       res.json({
         _id: user._id,
         firstName: user.firstName,
@@ -73,10 +108,10 @@ const loginUser = async (req, res) => {
         email: user.email,
         role: user.role,
         phone: user.phone,
+        isActive: user.isActive,
         token: generateToken(user._id),
       });
     } else {
-      //console.log(error);
       res.status(401).json({
         message: "Invalid Email or Password",
       });
