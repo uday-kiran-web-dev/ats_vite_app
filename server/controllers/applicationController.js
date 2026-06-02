@@ -41,10 +41,7 @@ const applyJob = async (req, res) => {
     }
 
     // Get candidate profile
-    const profile = await Profile.findOne({
-      userId: req.user._id,
-      profileId: req.body._id,
-    });
+    const profile = await Profile.findOne({ userId: req.user._id });
 
     if (!profile || !profile.resume) {
       return res.status(400).json({
@@ -52,18 +49,9 @@ const applyJob = async (req, res) => {
       });
     }
 
-    const resumeFilename = profile.resume.startsWith("http")
-      ? path.basename(new URL(profile.resume).pathname)
-      : path.basename(profile.resume);
-
-    const resumeStream = profile.resume.startsWith("http")
-      ? (await axios.get(profile.resume, { responseType: "stream" })).data
-      : fs.createReadStream(path.join(__dirname, "..", profile.resume));
-
-    const formData = new FormData();
-    formData.append("file", resumeStream, { filename: resumeFilename });
-
-    formData.append("requirements", job.requirements.join(","));
+    const requirements = Array.isArray(job.requirements)
+      ? job.requirements.join(",")
+      : job.requirements || "";
 
     // Call Python analyzer (resilient)
     let analysis = {
@@ -74,6 +62,18 @@ const applyJob = async (req, res) => {
     };
 
     try {
+      const resumeFilename = profile.resume.startsWith("http")
+        ? path.basename(new URL(profile.resume).pathname)
+        : path.basename(profile.resume);
+
+      const resumeStream = profile.resume.startsWith("http")
+        ? (await axios.get(profile.resume, { responseType: "stream" })).data
+        : fs.createReadStream(path.join(__dirname, "..", profile.resume));
+
+      const formData = new FormData();
+      formData.append("file", resumeStream, { filename: resumeFilename });
+      formData.append("requirements", requirements);
+
       const analysisResponse = await axios.post(
         process.env.FILE_UPLOAD_PATH,
         formData,
