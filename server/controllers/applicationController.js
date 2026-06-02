@@ -65,16 +65,31 @@ const applyJob = async (req, res) => {
 
     formData.append("requirements", job.requirements.join(","));
 
-    // Call Python analyzer
-    const analysisResponse = await axios.post(
-      `${process.env.FILE_UPLOAD_PATH}`,
-      formData,
-      {
-        headers: formData.getHeaders(),
-      },
-    );
+    // Call Python analyzer (resilient)
+    let analysis = {
+      matchScore: 0,
+      matchedSkills: [],
+      missingSkills: [],
+      recommendation: "No analysis",
+    };
 
-    const analysis = analysisResponse.data;
+    try {
+      const analysisResponse = await axios.post(
+        process.env.FILE_UPLOAD_PATH,
+        formData,
+        {
+          headers: formData.getHeaders(),
+          timeout: 15000,
+        },
+      );
+
+      if (analysisResponse && analysisResponse.data) {
+        analysis = analysisResponse.data;
+      }
+    } catch (err) {
+      console.error("Resume analyzer failed:", err.message || err);
+      // proceed without analysis result (use defaults above)
+    }
 
     //Check if candidate is already applied for this Job
     const existingApplication = await Application.findOne({
