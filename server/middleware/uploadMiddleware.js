@@ -2,7 +2,7 @@ const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
 
-const resumeUploadDir = path.join(__dirname, "..", "uploads", "resumes");
+const resumeUploadDir = path.join(__dirname, "uploads", "resumes");
 fs.mkdirSync(resumeUploadDir, { recursive: true });
 
 //Storage configuration
