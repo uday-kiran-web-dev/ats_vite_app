@@ -117,11 +117,7 @@ function Profile() {
         dataPayload.append("resume", resume);
       }
 
-      const { data } = await API.post("/profiles", dataPayload, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const { data } = await API.post("/profiles", dataPayload);
 
       if (data?.userId) {
         const updatedUser = {
@@ -389,11 +385,7 @@ function Profile() {
           {profile?.resume && (
             <div className="mt-6">
               <a
-                href={
-                  profile.resume.startsWith("http")
-                    ? profile.resume
-                    : `${import.meta.env.VITE_SERVER_PATH}/${profile.resume}`
-                }
+                href={`${profile.resume}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-600 underline"
