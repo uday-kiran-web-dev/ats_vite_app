@@ -9,7 +9,7 @@ const getPlainText = (text) =>
 function JobCard({ job, showActions = false, onDelete, onEdit }) {
   const snippetSource = getPlainText(job.description);
   const descriptionWords = snippetSource.split(" ").filter(Boolean);
-  const descriptionSnippet = descriptionWords.slice(0, 10).join(" ");
+  const descriptionSnippet = descriptionWords.slice(0, 20).join(" ");
 
   return (
     <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
@@ -18,12 +18,12 @@ function JobCard({ job, showActions = false, onDelete, onEdit }) {
       </Link>
       <p className="text-gray-600 mb-4">
         {job.location || "Location not specified"} •{" "}
-        {job.jobType || job.jobTpye || "Job type not set"}
+        {job.jobType || "Job type not set"}
       </p>
       {descriptionSnippet && (
         <p className="mb-4 text-sm text-gray-700">
           {descriptionSnippet}
-          {descriptionWords.length > 10 ? "..." : ""}
+          {descriptionWords.length > 20 ? "..." : ""}
         </p>
       )}
 

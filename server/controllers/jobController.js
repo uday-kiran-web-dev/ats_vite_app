@@ -37,10 +37,9 @@ const createJob = async (req, res) => {
 //Get all jobs
 const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find().populate(
-      "recruiterId",
-      "firstName lastName email",
-    );
+    const jobs = await Job.find()
+      .sort({ createdAt: -1 })
+      .populate("recruiterId", "firstName lastName email");
 
     return res.status(200).json(jobs);
   } catch (error) {
@@ -56,15 +55,13 @@ const getJobsForUser = async (req, res) => {
     let jobs;
 
     if (req.user.role === "Recruiter") {
-      jobs = await Job.find({ recruiterId: req.user._id }).populate(
-        "recruiterId",
-        "firstName lastName email",
-      );
+      jobs = await Job.find({ recruiterId: req.user._id })
+        .sort({ createdAt: -1 })
+        .populate("recruiterId", "firstName lastName email");
     } else if (req.user.role === "Admin") {
-      jobs = await Job.find().populate(
-        "recruiterId",
-        "firstName lastName email",
-      );
+      jobs = await Job.find()
+        .sort({ createdAt: -1 })
+        .populate("recruiterId", "firstName lastName email");
     } else {
       return res.status(403).json({
         message: "User not authorized to access this resource",
