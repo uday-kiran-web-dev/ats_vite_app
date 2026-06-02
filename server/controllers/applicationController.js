@@ -52,11 +52,16 @@ const applyJob = async (req, res) => {
       });
     }
 
-    // Create form data
-    const resumeAbsolutePath = path.join(__dirname, "..", profile.resume);
-    const formData = new FormData();
+    const resumeFilename = profile.resume.startsWith("http")
+      ? path.basename(new URL(profile.resume).pathname)
+      : path.basename(profile.resume);
 
-    formData.append("file", fs.createReadStream(resumeAbsolutePath));
+    const resumeStream = profile.resume.startsWith("http")
+      ? (await axios.get(profile.resume, { responseType: "stream" })).data
+      : fs.createReadStream(path.join(__dirname, "..", profile.resume));
+
+    const formData = new FormData();
+    formData.append("file", resumeStream, { filename: resumeFilename });
 
     formData.append("requirements", job.requirements.join(","));
 

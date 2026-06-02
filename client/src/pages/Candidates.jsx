@@ -132,7 +132,11 @@ function Candidates() {
                     <div className="flex flex-wrap gap-2 text-sm">
                       {profile.resume ? (
                         <a
-                          href={`${import.meta.env.VITE_SERVER_PATH}/${profile.resume}`}
+                          href={
+                            profile.resume.startsWith("http")
+                              ? profile.resume
+                              : `${import.meta.env.VITE_SERVER_PATH}/${profile.resume}`
+                          }
                           target="_blank"
                           rel="noreferrer"
                           className="text-green-600 underline"

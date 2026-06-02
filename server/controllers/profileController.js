@@ -1,13 +1,26 @@
 const bcrypt = require("bcryptjs");
-const path = require("path");
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 const Profile = require("../models/Profile");
 const User = require("../models/User");
 
-const getResumeRelativePath = (filePath) => {
-  if (!filePath) return "";
-  const relative = path.relative(path.join(__dirname, ".."), filePath);
-  return relative.split(path.sep).join("/");
-};
+const uploadResumeToCloudinary = (file) =>
+  new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "raw",
+        folder: "resumes",
+        public_id: `${Date.now()}-${file.originalname}`,
+        overwrite: true,
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      },
+    );
+
+    streamifier.createReadStream(file.buffer).pipe(uploadStream);
+  });
 
 //Create or update profile
 const createOrUpdateProfile = async (req, res) => {
@@ -26,7 +39,8 @@ const createOrUpdateProfile = async (req, res) => {
     let resumePath = "";
 
     if (req.file) {
-      resumePath = getResumeRelativePath(req.file.path);
+      const uploadResult = await uploadResumeToCloudinary(req.file);
+      resumePath = uploadResult.secure_url;
     }
 
     //Find existing profile for authenticated user
@@ -225,7 +239,9 @@ const createCandidateByRecruiter = async (req, res) => {
       ? skills.split(",").map((skill) => skill.trim())
       : [];
 
-    const resumePath = req.file ? getResumeRelativePath(req.file.path) : "";
+    const resumePath = req.file
+      ? (await uploadResumeToCloudinary(req.file)).secure_url
+      : "";
 
     const profile = await Profile.create({
       userId: user._id,
@@ -307,7 +323,8 @@ const updateProfileById = async (req, res) => {
     profile.portfolio = portfolio ?? profile.portfolio;
 
     if (req.file) {
-      profile.resume = getResumeRelativePath(req.file.path);
+      const uploadResult = await uploadResumeToCloudinary(req.file);
+      profile.resume = uploadResult.secure_url;
     }
 
     await profile.save();
