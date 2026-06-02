@@ -3,6 +3,7 @@ const axios = require("axios");
 const FormData = require("form-data");
 
 const fs = require("fs");
+const path = require("path");
 
 const Profile = require("../models/Profile");
 const Application = require("../models/Application");
@@ -52,9 +53,10 @@ const applyJob = async (req, res) => {
     }
 
     // Create form data
+    const resumeAbsolutePath = path.join(__dirname, "..", profile.resume);
     const formData = new FormData();
 
-    formData.append("file", fs.createReadStream(profile.resume));
+    formData.append("file", fs.createReadStream(resumeAbsolutePath));
 
     formData.append("requirements", job.requirements.join(","));
 

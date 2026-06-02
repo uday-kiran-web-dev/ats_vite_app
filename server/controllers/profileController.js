@@ -1,6 +1,13 @@
 const bcrypt = require("bcryptjs");
+const path = require("path");
 const Profile = require("../models/Profile");
 const User = require("../models/User");
+
+const getResumeRelativePath = (filePath) => {
+  if (!filePath) return "";
+  const relative = path.relative(path.join(__dirname, ".."), filePath);
+  return relative.split(path.sep).join("/");
+};
 
 //Create or update profile
 const createOrUpdateProfile = async (req, res) => {
@@ -19,7 +26,7 @@ const createOrUpdateProfile = async (req, res) => {
     let resumePath = "";
 
     if (req.file) {
-      resumePath = req.file.path;
+      resumePath = getResumeRelativePath(req.file.path);
     }
 
     //Find existing profile for authenticated user
@@ -218,7 +225,7 @@ const createCandidateByRecruiter = async (req, res) => {
       ? skills.split(",").map((skill) => skill.trim())
       : [];
 
-    const resumePath = req.file ? req.file.path : "";
+    const resumePath = req.file ? getResumeRelativePath(req.file.path) : "";
 
     const profile = await Profile.create({
       userId: user._id,
@@ -300,7 +307,7 @@ const updateProfileById = async (req, res) => {
     profile.portfolio = portfolio ?? profile.portfolio;
 
     if (req.file) {
-      profile.resume = req.file.path;
+      profile.resume = getResumeRelativePath(req.file.path);
     }
 
     await profile.save();
