@@ -481,7 +481,11 @@ function ApplicationDetails() {
                     <p className="mt-5 text-sm text-gray-700">
                       <span className="font-semibold">Resume:</span>
                       <a
-                        href={`${import.meta.env.VITE_SERVER_PATH}/${application.resume}`}
+                        href={
+                          application.resume?.startsWith("http")
+                            ? application.resume
+                            : `${import.meta.env.VITE_SERVER_PATH}/${application.resume}`
+                        }
                         target="_blank"
                         rel="noreferrer"
                         className="text-white bg-green-600 px-3 py-2 rounded "
@@ -492,7 +496,11 @@ function ApplicationDetails() {
                     {/* <p className="mt-5 text-sm text-gray-700">
                       <span className="font-semibold">Cover Letter:</span>
                       <a
-                        href={`${import.meta.env.VITE_SERVER_PATH}/${application.coverLetter}`}
+                        href={
+                          application.coverLetter?.startsWith("http")
+                            ? application.coverLetter
+                            : `${import.meta.env.VITE_SERVER_PATH}/${application.coverLetter}`
+                        }
                         target="_blank"
                         rel="noreferrer"
                         className="text-white bg-green-600 px-3 py-2 rounded"

@@ -17,6 +17,12 @@ const {
   interviewScheduledTemplate,
 } = require("../services/emailService");
 
+const analyzerEndpoint =
+  process.env.FILE_UPLOAD_PATH?.trim() ||
+  (process.env.NODE_ENV !== "production"
+    ? "http://127.0.0.1:8000/analyze-resume"
+    : "");
+
 //Applying for a job
 const applyJob = async (req, res) => {
   try {
@@ -61,34 +67,49 @@ const applyJob = async (req, res) => {
       recommendation: "No analysis",
     };
 
-    try {
-      const resumeFilename = profile.resume.startsWith("http")
-        ? path.basename(new URL(profile.resume).pathname)
-        : path.basename(profile.resume);
+    if (!analyzerEndpoint) {
+      console.warn(
+        "Resume analyzer endpoint is not configured. Set FILE_UPLOAD_PATH in env to enable analysis.",
+      );
+    } else {
+      try {
+        const resumeFilename = profile.resume.startsWith("http")
+          ? path.basename(new URL(profile.resume).pathname)
+          : path.basename(profile.resume);
 
-      const resumeStream = profile.resume.startsWith("http")
-        ? (await axios.get(profile.resume, { responseType: "stream" })).data
-        : fs.createReadStream(path.join(__dirname, "..", profile.resume));
+        const resumeStream = profile.resume.startsWith("http")
+          ? (await axios.get(profile.resume, { responseType: "stream" })).data
+          : fs.createReadStream(path.join(__dirname, "..", profile.resume));
 
-      const formData = new FormData();
-      formData.append("file", resumeStream, { filename: resumeFilename });
-      formData.append("requirements", requirements);
+        const formData = new FormData();
+        formData.append("file", resumeStream, { filename: resumeFilename });
+        formData.append("requirements", requirements);
 
-      const analysisResponse = await axios.post(
-        process.env.FILE_UPLOAD_PATH,
-        formData,
-        {
+        const analysisResponse = await axios.post(analyzerEndpoint, formData, {
           headers: formData.getHeaders(),
           timeout: 15000,
-        },
-      );
+          maxContentLength: Infinity,
+          maxBodyLength: Infinity,
+        });
 
-      if (analysisResponse && analysisResponse.data) {
-        analysis = analysisResponse.data;
+        if (analysisResponse && analysisResponse.data) {
+          analysis = analysisResponse.data;
+        } else {
+          console.warn(
+            "Resume analyzer returned empty response data:",
+            analysisResponse?.status,
+          );
+        }
+      } catch (err) {
+        console.error("Resume analyzer failed:", {
+          message: err.message,
+          code: err.code,
+          responseStatus: err.response?.status,
+          responseData: err.response?.data,
+          endpoint: analyzerEndpoint,
+        });
+        // proceed without analysis result (use defaults above)
       }
-    } catch (err) {
-      console.error("Resume analyzer failed:", err.message || err);
-      // proceed without analysis result (use defaults above)
     }
 
     //Check if candidate is already applied for this Job
