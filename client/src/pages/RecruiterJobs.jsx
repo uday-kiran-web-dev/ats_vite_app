@@ -447,7 +447,7 @@ function RecruiterJobs() {
             <div className="mt-4">
               <label className="block mb-2 font-medium">Job Description</label>
               <Editor
-                apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
+                apiKey={`${import.meta.env.VITE_TINYMCE_API_KEY}`}
                 value={editFormData.description}
                 init={editorInit}
                 onEditorChange={(content) =>
