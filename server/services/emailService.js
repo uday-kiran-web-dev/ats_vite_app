@@ -62,7 +62,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
       const resend = new Resend(RESEND_API_KEY);
 
       const response = await resend.emails.send({
-        from: EMAIL_FROM || "ATS <onboarding@resend.dev>",
+        from: "ATS <onboarding@resend.dev>",
         to,
         subject,
         html,
