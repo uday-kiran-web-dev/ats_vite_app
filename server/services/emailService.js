@@ -1,42 +1,12 @@
-const nodemailer = require("nodemailer");
+const { RESEND_API_KEY, EMAIL_FROM = "ATS <onboarding@resend.dev>" } =
+  process.env;
 
-const {
-  EMAIL_USER,
-  EMAIL_PASS,
-  EMAIL_FROM = EMAIL_USER,
-  RESEND_API_KEY,
-} = process.env;
-
-let transporter;
-const useResend = Boolean(RESEND_API_KEY);
-
-if (!useResend) {
-  transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST || "smtp.gmail.com",
-    port: process.env.EMAIL_PORT ? Number(process.env.EMAIL_PORT) : 587,
-    secure: process.env.EMAIL_SECURE === "true",
-    auth: {
-      user: EMAIL_USER,
-      pass: EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
-
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error("Email transporter verification failed", error);
-    } else {
-      console.log("Email transporter is ready to send messages");
-    }
-  });
-}
-
-if (useResend) {
-  console.log("Email service using Resend API");
+if (!RESEND_API_KEY) {
+  console.error(
+    "Resend API key is not configured. Email notifications are disabled.",
+  );
 } else {
-  console.log("Email service using SMTP transporter");
+  console.log("Email service using Resend API");
 }
 
 const wrapHtml = (title, body) => `
@@ -56,49 +26,28 @@ const wrapHtml = (title, body) => `
 `;
 
 const sendEmail = async ({ to, subject, html, text }) => {
-  if (useResend) {
-    try {
-      const { Resend } = require("resend");
-      const resend = new Resend(RESEND_API_KEY);
-
-      const response = await resend.emails.send({
-        from: "ATS <onboarding@resend.dev>",
-        to,
-        subject,
-        html,
-      });
-
-      if (response.error) {
-        console.error("Resend email failed:", response.error);
-        return false;
-      }
-
-      console.log(`Email sent via Resend to ${to}: ${response.data?.id}`);
-      return true;
-    } catch (error) {
-      console.error("Failed to send email via Resend", error);
-      return false;
-    }
-  }
-
-  if (!EMAIL_USER || !EMAIL_PASS) {
-    console.warn("Email not sent: EMAIL_USER or EMAIL_PASS is not configured.");
+  if (!RESEND_API_KEY) {
+    console.error("Resend API key missing. Skipping email:", subject, "to", to);
     return false;
   }
 
   try {
-    const info = await transporter.sendMail({
+    const { Resend } = require("resend");
+    const resend = new Resend(RESEND_API_KEY);
+
+    const response = await resend.emails.send({
       from: EMAIL_FROM,
       to,
       subject,
-      text,
       html,
+      text,
     });
 
-    console.log(`Email sent to ${to}: ${info.messageId}`);
+    const messageId = response.id || response.data?.id || response.messageId;
+    console.log(`Email sent via Resend to ${to}: ${messageId}`);
     return true;
   } catch (error) {
-    console.error("Failed to send email", error);
+    console.error("Failed to send email via Resend", error);
     return false;
   }
 };
