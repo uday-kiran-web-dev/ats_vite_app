@@ -7,9 +7,12 @@ const {
   EMAIL_USER,
   EMAIL_PASS,
   EMAIL_FROM,
+  BREVO_API_KEY,
+  EMAIL_USE_SMTP,
 } = process.env;
 
-const useSmtp = Boolean(EMAIL_USER && EMAIL_PASS);
+const useSmtp = EMAIL_USE_SMTP === "true" && Boolean(EMAIL_USER && EMAIL_PASS);
+const useBrevoApi = Boolean(BREVO_API_KEY);
 let transporter;
 
 if (useSmtp) {
@@ -69,21 +72,69 @@ const sendEmail = async ({ to, subject, html, text }) => {
     return false;
   }
 
-  try {
-    const info = await transporter.sendMail({
-      from: EMAIL_FROM,
-      to,
-      subject,
-      text,
-      html,
-    });
+  if (useSmtp && transporter) {
+    try {
+      const info = await transporter.sendMail({
+        from: EMAIL_FROM,
+        to,
+        subject,
+        text,
+        html,
+      });
 
-    console.log(`Email sent via Brevo SMTP to ${to}: ${info.messageId}`);
-    return true;
-  } catch (error) {
-    console.error("Failed to send email via Brevo SMTP", error);
-    return false;
+      console.log(`Email sent via Brevo SMTP to ${to}: ${info.messageId}`);
+      return true;
+    } catch (error) {
+      console.error("Brevo SMTP send failed", error);
+      if (!useBrevoApi) {
+        return false;
+      }
+      console.log("Falling back to Brevo REST API after SMTP failure.");
+    }
   }
+
+  if (useBrevoApi) {
+    try {
+      const axios = require("axios");
+      const response = await axios.post(
+        "https://api.brevo.com/v3/smtp/email",
+        {
+          sender: {
+            email: EMAIL_FROM.replace(/.*<(.+)>/, "$1"),
+            name: EMAIL_FROM.replace(/^(.*) <.*>$/, "$1"),
+          },
+          to: Array.isArray(to)
+            ? to.map((address) => ({ email: address }))
+            : [{ email: to }],
+          subject,
+          htmlContent: html,
+          textContent: text,
+        },
+        {
+          headers: {
+            "api-key": BREVO_API_KEY,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      console.log(
+        `Email sent via Brevo API to ${to}: ${response.data.messageId || response.data["messageId"] || response.data.id}`,
+      );
+      return true;
+    } catch (error) {
+      console.error(
+        "Failed to send email via Brevo API",
+        error.response?.data || error.message || error,
+      );
+      return false;
+    }
+  }
+
+  console.error(
+    "No available email provider configured. Set BREVO_API_KEY or EMAIL_USER/EMAIL_PASS.",
+  );
+  return false;
 };
 
 const welcomeTemplate = (user) => {
