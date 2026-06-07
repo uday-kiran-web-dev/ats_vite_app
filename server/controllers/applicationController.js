@@ -202,8 +202,10 @@ const applyJob = async (req, res) => {
       }
     };
 
-    sendApplicationNotifications().catch((err) => {
-      console.error("Unexpected error in email notification task", err);
+    setImmediate(() => {
+      sendApplicationNotifications().catch((err) => {
+        console.error("Unexpected error in email notification task", err);
+      });
     });
     return;
   } catch (error) {

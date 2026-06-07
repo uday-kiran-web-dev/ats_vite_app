@@ -1,48 +1,27 @@
-const axios = require("axios");
 const nodemailer = require("nodemailer");
 
-const {
-  EMAIL_USER,
-  EMAIL_PASS,
-  EMAIL_FROM = EMAIL_USER,
-  EMAIL_HOST,
-  EMAIL_PORT,
-  EMAIL_SECURE,
-  SENDGRID_API_KEY,
-} = process.env;
+const { EMAIL_USER, EMAIL_PASS, EMAIL_FROM = EMAIL_USER } = process.env;
 
-const useSendGrid = Boolean(SENDGRID_API_KEY);
-let transporter;
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST || "smtp.gmail.com",
+  port: process.env.EMAIL_PORT ? Number(process.env.EMAIL_PORT) : 587,
+  secure: process.env.EMAIL_SECURE === "true",
+  auth: {
+    user: EMAIL_USER,
+    pass: EMAIL_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
 
-if (!useSendGrid) {
-  const transportOptions = EMAIL_HOST
-    ? {
-        host: EMAIL_HOST,
-        port: EMAIL_PORT ? parseInt(EMAIL_PORT, 10) : 587,
-        secure: EMAIL_SECURE === "true",
-        auth: {
-          user: EMAIL_USER,
-          pass: EMAIL_PASS,
-        },
-      }
-    : {
-        service: "gmail",
-        auth: {
-          user: EMAIL_USER,
-          pass: EMAIL_PASS,
-        },
-      };
-
-  transporter = nodemailer.createTransport(transportOptions);
-
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error("Email transporter verification failed", error);
-    } else {
-      console.log("Email transporter is ready to send messages");
-    }
-  });
-}
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("Email transporter verification failed", error);
+  } else {
+    console.log("Email transporter is ready to send messages");
+  }
+});
 
 const wrapHtml = (title, body) => `
   <div style="font-family: Arial, sans-serif; background:#f4f5f7; padding:24px;">
@@ -61,43 +40,6 @@ const wrapHtml = (title, body) => `
 `;
 
 const sendEmail = async ({ to, subject, html, text }) => {
-  if (useSendGrid) {
-    try {
-      const payload = {
-        personalizations: [
-          {
-            to: [{ email: to }],
-          },
-        ],
-        from: {
-          email: EMAIL_USER,
-          name: EMAIL_FROM || "ATS Notifications",
-        },
-        subject,
-        content: [
-          { type: "text/plain", value: text },
-          { type: "text/html", value: html },
-        ],
-      };
-
-      await axios.post("https://api.sendgrid.com/v3/mail/send", payload, {
-        headers: {
-          Authorization: `Bearer ${SENDGRID_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log(`SendGrid email sent to ${to}`);
-      return true;
-    } catch (error) {
-      console.error(
-        "Failed to send email via SendGrid",
-        error.response?.data || error.message || error,
-      );
-      return false;
-    }
-  }
-
   if (!EMAIL_USER || !EMAIL_PASS) {
     console.warn("Email not sent: EMAIL_USER or EMAIL_PASS is not configured.");
     return false;
