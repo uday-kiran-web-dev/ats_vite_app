@@ -32,16 +32,18 @@ async def analyze_resume(
     # Extract text
     resume_text = extract_resume_text(file_path)
 
-    # Extract skills
-    candidate_skills = extract_skills(
-        resume_text
-    )
-
     # Parse requirements
     job_requirements = [
-        skill.strip()
+        skill.strip().lower()
         for skill in requirements.split(",")
+        if skill.strip()
     ]
+
+    # Extract skills only from the provided requirements
+    candidate_skills = extract_skills(
+        resume_text,
+        required_skills=job_requirements,
+    )
 
     # Match
     result = match_skills(

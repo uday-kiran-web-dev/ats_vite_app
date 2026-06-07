@@ -1,35 +1,24 @@
 import re
 
 
-COMMON_SKILLS = [
-    "react",
-    "javascript",
-    "node.js",
-    "mongodb",
-    "python",
-    "java",
-    "docker",
-    "aws",
-    "sql",
-    "html",
-    "css",
-    "typescript",
-    "express",
-    "git",
-]
+def normalize_skill(skill):
+    return skill.strip().lower()
 
 
-def extract_skills(text):
-
+def extract_skills(text, required_skills=None):
     text = text.lower()
+    required_skills = required_skills or []
 
     found_skills = []
+    for skill in required_skills:
+        normalized = normalize_skill(skill)
+        if not normalized:
+            continue
 
-    for skill in COMMON_SKILLS:
-        if re.search(r"\b" + re.escape(skill) + r"\b", text):
-            found_skills.append(skill)
+        if re.search(r"(^|\W)" + re.escape(normalized) + r"($|\W)", text):
+            found_skills.append(normalized)
 
-    return list(set(found_skills))
+    return sorted(set(found_skills))
 
 
 def match_skills(
