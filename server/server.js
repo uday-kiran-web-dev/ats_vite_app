@@ -45,6 +45,36 @@ app.get("/", (req, res) => {
   res.send("ATS Server is running");
 });
 
+app.get("/api/email-test", async (req, res) => {
+  const to = req.query.to || process.env.EMAIL_USER;
+
+  if (!to) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Missing recipient email. Provide ?to=you@example.com or configure EMAIL_USER.",
+    });
+  }
+
+  const { sendEmail } = require("./services/emailService");
+
+  const isSent = await sendEmail({
+    to,
+    subject: "ATS Email Test",
+    text: "This is a test email from your ATS server.",
+    html: "<p>This is a test email from your ATS server.</p>",
+  });
+
+  if (isSent) {
+    return res.json({ success: true, message: `Test email sent to ${to}` });
+  }
+
+  return res.status(500).json({
+    success: false,
+    message: "Unable to send test email. Check server logs for SMTP errors.",
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
