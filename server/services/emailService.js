@@ -15,6 +15,10 @@ const useSmtp = EMAIL_USE_SMTP === "true" && Boolean(EMAIL_USER && EMAIL_PASS);
 const useBrevoApi = Boolean(BREVO_API_KEY);
 let transporter;
 
+console.log(
+  `Email config loaded: SMTP=${useSmtp ? "enabled" : "disabled"}, API=${useBrevoApi ? "enabled" : "disabled"}, EMAIL_FROM=${EMAIL_FROM}`,
+);
+
 if (useSmtp) {
   transporter = nodemailer.createTransport({
     host: EMAIL_HOST || "smtp-relay.brevo.com",
