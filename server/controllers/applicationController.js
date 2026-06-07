@@ -160,6 +160,11 @@ const applyJob = async (req, res) => {
     res.status(201).json(application);
 
     const sendApplicationNotifications = async () => {
+      console.log(
+        "Dispatching application notification emails for application",
+        application._id,
+      );
+
       try {
         const candidateMail = applicationSubmittedTemplate(req.user, job);
         const emailPromises = [
@@ -187,13 +192,19 @@ const applyJob = async (req, res) => {
           );
         }
 
-        await Promise.allSettled(emailPromises);
+        const results = await Promise.allSettled(emailPromises);
+        console.log(
+          "Application email notification results:",
+          results.map((result) => result.status),
+        );
       } catch (emailError) {
         console.error("Application email notification failed", emailError);
       }
     };
 
-    sendApplicationNotifications();
+    sendApplicationNotifications().catch((err) => {
+      console.error("Unexpected error in email notification task", err);
+    });
     return;
   } catch (error) {
     return res.status(500).json({

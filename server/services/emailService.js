@@ -3,13 +3,19 @@ const nodemailer = require("nodemailer");
 const { EMAIL_USER, EMAIL_PASS, EMAIL_FROM = EMAIL_USER } = process.env;
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+  service: "gmail",
   auth: {
     user: EMAIL_USER,
     pass: EMAIL_PASS,
   },
+});
+
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("Email transporter verification failed", error);
+  } else {
+    console.log("Email transporter is ready to send messages");
+  }
 });
 
 const wrapHtml = (title, body) => `
@@ -31,19 +37,23 @@ const wrapHtml = (title, body) => `
 const sendEmail = async ({ to, subject, html, text }) => {
   if (!EMAIL_USER || !EMAIL_PASS) {
     console.warn("Email not sent: EMAIL_USER or EMAIL_PASS is not configured.");
-    return;
+    return false;
   }
 
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: EMAIL_FROM,
       to,
       subject,
       text,
       html,
     });
+
+    console.log(`Email sent to ${to}: ${info.messageId}`);
+    return true;
   } catch (error) {
     console.error("Failed to send email", error);
+    return false;
   }
 };
 
