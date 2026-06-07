@@ -46,13 +46,12 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/email-test", async (req, res) => {
-  const to = req.query.to || process.env.EMAIL_USER;
+  const to = req.query.to;
 
   if (!to) {
     return res.status(400).json({
       success: false,
-      message:
-        "Missing recipient email. Provide ?to=you@example.com or configure EMAIL_USER.",
+      message: "Missing recipient email. Provide ?to=you@example.com.",
     });
   }
 
@@ -71,7 +70,7 @@ app.get("/api/email-test", async (req, res) => {
 
   return res.status(500).json({
     success: false,
-    message: "Unable to send test email. Check server logs for SMTP errors.",
+    message: "Unable to send test email. Check server logs for Resend errors.",
   });
 });
 
