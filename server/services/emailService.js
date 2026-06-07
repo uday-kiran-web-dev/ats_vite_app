@@ -1,4 +1,4 @@
-const { RESEND_API_KEY, EMAIL_FROM = "ATS <onboarding@resend.dev>" } =
+const { RESEND_API_KEY, EMAIL_FROM = "ATS <chanduwebdev29@gmail.com>" } =
   process.env;
 
 if (!RESEND_API_KEY) {
