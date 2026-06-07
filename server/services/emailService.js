@@ -1,12 +1,12 @@
 const nodemailer = require("nodemailer");
 
 const {
-  EMAIL_HOST = "smtp-relay.brevo.com",
-  EMAIL_PORT = 587,
-  EMAIL_SECURE = "false",
+  EMAIL_HOST,
+  EMAIL_PORT,
+  EMAIL_SECURE,
   EMAIL_USER,
   EMAIL_PASS,
-  EMAIL_FROM = "ATS <no-reply@example.com>",
+  EMAIL_FROM,
 } = process.env;
 
 const useSmtp = Boolean(EMAIL_USER && EMAIL_PASS);
