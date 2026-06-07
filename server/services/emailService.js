@@ -1,12 +1,39 @@
-const { RESEND_API_KEY, EMAIL_FROM = "ATS <chanduwebdev29@gmail.com>" } =
-  process.env;
+const nodemailer = require("nodemailer");
 
-if (!RESEND_API_KEY) {
-  console.error(
-    "Resend API key is not configured. Email notifications are disabled.",
-  );
+const {
+  EMAIL_HOST = "smtp-relay.brevo.com",
+  EMAIL_PORT = 587,
+  EMAIL_SECURE = "false",
+  EMAIL_USER,
+  EMAIL_PASS,
+  EMAIL_FROM = "ATS <no-reply@example.com>",
+} = process.env;
+
+const useSmtp = Boolean(EMAIL_USER && EMAIL_PASS);
+let transporter;
+
+if (useSmtp) {
+  transporter = nodemailer.createTransport({
+    host: EMAIL_HOST,
+    port: Number(EMAIL_PORT),
+    secure: EMAIL_SECURE === "true",
+    auth: {
+      user: EMAIL_USER,
+      pass: EMAIL_PASS,
+    },
+  });
+
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error("Brevo SMTP transporter verification failed", error);
+    } else {
+      console.log("Brevo SMTP transporter is ready to send messages");
+    }
+  });
 } else {
-  console.log("Email service using Resend API");
+  console.error(
+    "Brevo SMTP is not configured. Set EMAIL_USER and EMAIL_PASS to your Brevo SMTP credentials.",
+  );
 }
 
 const wrapHtml = (title, body) => `
@@ -26,28 +53,29 @@ const wrapHtml = (title, body) => `
 `;
 
 const sendEmail = async ({ to, subject, html, text }) => {
-  if (!RESEND_API_KEY) {
-    console.error("Resend API key missing. Skipping email:", subject, "to", to);
+  if (!transporter) {
+    console.error(
+      "Brevo SMTP transporter is not available. Skipping email:",
+      subject,
+      "to",
+      to,
+    );
     return false;
   }
 
   try {
-    const { Resend } = require("resend");
-    const resend = new Resend(RESEND_API_KEY);
-
-    const response = await resend.emails.send({
+    const info = await transporter.sendMail({
       from: EMAIL_FROM,
       to,
       subject,
-      html,
       text,
+      html,
     });
 
-    const messageId = response.id || response.data?.id || response.messageId;
-    console.log(`Email sent via Resend to ${to}: ${messageId}`);
+    console.log(`Email sent via Brevo SMTP to ${to}: ${info.messageId}`);
     return true;
   } catch (error) {
-    console.error("Failed to send email via Resend", error);
+    console.error("Failed to send email via Brevo SMTP", error);
     return false;
   }
 };

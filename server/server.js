@@ -70,7 +70,7 @@ app.get("/api/email-test", async (req, res) => {
 
   return res.status(500).json({
     success: false,
-    message: "Unable to send test email. Check server logs for Resend errors.",
+    message: "Unable to send test email. Check server logs for SMTP errors.",
   });
 });
 
