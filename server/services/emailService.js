@@ -14,13 +14,19 @@ let transporter;
 
 if (useSmtp) {
   transporter = nodemailer.createTransport({
-    host: EMAIL_HOST,
-    port: Number(EMAIL_PORT),
+    host: EMAIL_HOST || "smtp-relay.brevo.com",
+    port: Number(EMAIL_PORT || 587),
     secure: EMAIL_SECURE === "true",
     auth: {
       user: EMAIL_USER,
       pass: EMAIL_PASS,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
   });
 
   transporter.verify((error, success) => {
