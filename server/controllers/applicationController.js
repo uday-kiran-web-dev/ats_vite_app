@@ -157,37 +157,44 @@ const applyJob = async (req, res) => {
       },
     });
 
-    try {
-      const candidateMail = applicationSubmittedTemplate(req.user, job);
-      await sendEmail({
-        to: req.user.email,
-        subject: candidateMail.subject,
-        html: candidateMail.html,
-        text: candidateMail.text,
-      });
-    } catch (emailError) {
-      console.error("Candidate application email failed", emailError);
-    }
+    res.status(201).json(application);
 
-    if (job.recruiterId?.email) {
+    const sendApplicationNotifications = async () => {
       try {
-        const recruiterMail = recruiterNewApplicationTemplate(
-          job.recruiterId,
-          req.user,
-          job,
-        );
-        await sendEmail({
-          to: job.recruiterId.email,
-          subject: recruiterMail.subject,
-          html: recruiterMail.html,
-          text: recruiterMail.text,
-        });
-      } catch (emailError) {
-        console.error("Recruiter notification email failed", emailError);
-      }
-    }
+        const candidateMail = applicationSubmittedTemplate(req.user, job);
+        const emailPromises = [
+          sendEmail({
+            to: req.user.email,
+            subject: candidateMail.subject,
+            html: candidateMail.html,
+            text: candidateMail.text,
+          }),
+        ];
 
-    return res.status(201).json(application);
+        if (job.recruiterId?.email) {
+          const recruiterMail = recruiterNewApplicationTemplate(
+            job.recruiterId,
+            req.user,
+            job,
+          );
+          emailPromises.push(
+            sendEmail({
+              to: job.recruiterId.email,
+              subject: recruiterMail.subject,
+              html: recruiterMail.html,
+              text: recruiterMail.text,
+            }),
+          );
+        }
+
+        await Promise.allSettled(emailPromises);
+      } catch (emailError) {
+        console.error("Application email notification failed", emailError);
+      }
+    };
+
+    sendApplicationNotifications();
+    return;
   } catch (error) {
     return res.status(500).json({
       message: error.message,
