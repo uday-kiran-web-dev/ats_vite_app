@@ -1,27 +1,43 @@
 const nodemailer = require("nodemailer");
 
-const { EMAIL_USER, EMAIL_PASS, EMAIL_FROM = EMAIL_USER } = process.env;
+const {
+  EMAIL_USER,
+  EMAIL_PASS,
+  EMAIL_FROM = EMAIL_USER,
+  RESEND_API_KEY,
+} = process.env;
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || "smtp.gmail.com",
-  port: process.env.EMAIL_PORT ? Number(process.env.EMAIL_PORT) : 587,
-  secure: process.env.EMAIL_SECURE === "true",
-  auth: {
-    user: EMAIL_USER,
-    pass: EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+let transporter;
+const useResend = Boolean(RESEND_API_KEY);
 
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("Email transporter verification failed", error);
-  } else {
-    console.log("Email transporter is ready to send messages");
-  }
-});
+if (!useResend) {
+  transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || "smtp.gmail.com",
+    port: process.env.EMAIL_PORT ? Number(process.env.EMAIL_PORT) : 587,
+    secure: process.env.EMAIL_SECURE === "true",
+    auth: {
+      user: EMAIL_USER,
+      pass: EMAIL_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error("Email transporter verification failed", error);
+    } else {
+      console.log("Email transporter is ready to send messages");
+    }
+  });
+}
+
+if (useResend) {
+  console.log("Email service using Resend API");
+} else {
+  console.log("Email service using SMTP transporter");
+}
 
 const wrapHtml = (title, body) => `
   <div style="font-family: Arial, sans-serif; background:#f4f5f7; padding:24px;">
@@ -40,6 +56,31 @@ const wrapHtml = (title, body) => `
 `;
 
 const sendEmail = async ({ to, subject, html, text }) => {
+  if (useResend) {
+    try {
+      const { Resend } = require("resend");
+      const resend = new Resend(RESEND_API_KEY);
+
+      const response = await resend.emails.send({
+        from: EMAIL_FROM || "ATS <onboarding@resend.dev>",
+        to,
+        subject,
+        html,
+      });
+
+      if (response.error) {
+        console.error("Resend email failed:", response.error);
+        return false;
+      }
+
+      console.log(`Email sent via Resend to ${to}: ${response.data?.id}`);
+      return true;
+    } catch (error) {
+      console.error("Failed to send email via Resend", error);
+      return false;
+    }
+  }
+
   if (!EMAIL_USER || !EMAIL_PASS) {
     console.warn("Email not sent: EMAIL_USER or EMAIL_PASS is not configured.");
     return false;
