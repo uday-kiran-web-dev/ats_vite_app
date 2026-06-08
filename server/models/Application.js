@@ -40,18 +40,8 @@ const applicationSchema = new mongoose.Schema(
     },
     matchReport: {
       skillsMatch: [String],
-
-      matchSkills: [String],
-
       missingSkills: [String],
-
-      overallFit: {
-        type: String,
-      },
-
-      experienceMatch: {
-        type: String,
-      },
+      overallFit: String,
     },
     interviewSchedule: new mongoose.Schema(
       {

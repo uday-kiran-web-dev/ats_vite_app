@@ -1,7 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { model } = require("mongoose");
 const { sendEmail, welcomeTemplate } = require("../services/emailService");
 
 //Generate JWT Token

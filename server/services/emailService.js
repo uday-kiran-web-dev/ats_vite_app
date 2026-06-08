@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 const {
   EMAIL_HOST,
@@ -18,6 +19,16 @@ let transporter;
 console.log(
   `Email config loaded: SMTP=${useSmtp ? "enabled" : "disabled"}, API=${useBrevoApi ? "enabled" : "disabled"}, EMAIL_FROM=${EMAIL_FROM}`,
 );
+
+// Parse sender email and name from EMAIL_FROM
+const parseSender = (fromString) => {
+  const emailMatch = fromString.match(/<(.+?)>/);
+  const email = emailMatch ? emailMatch[1] : fromString;
+  const nameMatch = fromString.match(/^(.+?)\s*</);
+  const name = nameMatch ? nameMatch[1].trim() : "ATS System";
+
+  return { email, name };
+};
 
 if (useSmtp) {
   transporter = nodemailer.createTransport({
@@ -44,8 +55,8 @@ if (useSmtp) {
     }
   });
 } else {
-  console.error(
-    "Brevo SMTP is not configured. Set EMAIL_USER and EMAIL_PASS to your Brevo SMTP credentials.",
+  console.warn(
+    "Brevo email service not fully configured. Set EMAIL_USER and EMAIL_PASS for SMTP or BREVO_API_KEY for REST API.",
   );
 }
 
@@ -66,16 +77,7 @@ const wrapHtml = (title, body) => `
 `;
 
 const sendEmail = async ({ to, subject, html, text }) => {
-  if (!transporter) {
-    console.error(
-      "Brevo SMTP transporter is not available. Skipping email:",
-      subject,
-      "to",
-      to,
-    );
-    return false;
-  }
-
+  // Try SMTP first if configured
   if (useSmtp && transporter) {
     try {
       const info = await transporter.sendMail({
@@ -89,7 +91,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
       console.log(`Email sent via Brevo SMTP to ${to}: ${info.messageId}`);
       return true;
     } catch (error) {
-      console.error("Brevo SMTP send failed", error);
+      console.error("Brevo SMTP send failed", error.message);
       if (!useBrevoApi) {
         return false;
       }
@@ -97,15 +99,16 @@ const sendEmail = async ({ to, subject, html, text }) => {
     }
   }
 
+  // Fallback to Brevo REST API
   if (useBrevoApi) {
     try {
-      const axios = require("axios");
+      const sender = parseSender(EMAIL_FROM);
       const response = await axios.post(
         "https://api.brevo.com/v3/smtp/email",
         {
           sender: {
-            email: EMAIL_FROM.replace(/.*<(.+)>/, "$1"),
-            name: EMAIL_FROM.replace(/^(.*) <.*>$/, "$1"),
+            email: sender.email,
+            name: sender.name,
           },
           to: Array.isArray(to)
             ? to.map((address) => ({ email: address }))
@@ -119,24 +122,25 @@ const sendEmail = async ({ to, subject, html, text }) => {
             "api-key": BREVO_API_KEY,
             "Content-Type": "application/json",
           },
+          timeout: 10000,
         },
       );
 
       console.log(
-        `Email sent via Brevo API to ${to}: ${response.data.messageId || response.data["messageId"] || response.data.id}`,
+        `Email sent via Brevo API to ${to}: ${response.data.messageId}`,
       );
       return true;
     } catch (error) {
       console.error(
-        "Failed to send email via Brevo API",
-        error.response?.data || error.message || error,
+        "Failed to send email via Brevo API:",
+        error.response?.data?.message || error.message,
       );
       return false;
     }
   }
 
   console.error(
-    "No available email provider configured. Set BREVO_API_KEY or EMAIL_USER/EMAIL_PASS.",
+    "No email provider configured. Set EMAIL_USER/EMAIL_PASS or BREVO_API_KEY.",
   );
   return false;
 };
