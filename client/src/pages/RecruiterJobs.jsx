@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Editor } from "@tinymce/tinymce-react";
+// import { Editor } from "@tinymce/tinymce-react";
+import RichTextEditor from "../components/RichTextEditor";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
@@ -328,12 +329,21 @@ function RecruiterJobs() {
             </div> */}
             <div className="mt-4">
               <label className="block mb-2 font-medium">Job Description</label>
-              <Editor
+              {/* <Editor
                 apiKey={import.meta.env.VITE_TINYMCE_API_KEY}
                 value={formData.description}
                 init={editorInit}
                 onEditorChange={(content) =>
                   setFormData((prev) => ({ ...prev, description: content }))
+                }
+              /> */}
+              <RichTextEditor
+                value={formData.description}
+                onChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    description: value,
+                  })
                 }
               />
             </div>
@@ -446,12 +456,18 @@ function RecruiterJobs() {
 
             <div className="mt-4">
               <label className="block mb-2 font-medium">Job Description</label>
-              <Editor
+              {/* <Editor
                 apiKey="bfm6ejrkogrl8t2p5zz8hnouuzrpjv7mtu3804lx8h09sgta"
                 value={editFormData.description}
                 init={editorInit}
                 onEditorChange={(content) =>
                   setEditFormData((prev) => ({ ...prev, description: content }))
+                }
+              /> */}
+              <RichTextEditor
+                value={editFormData.description}
+                onChange={(value) =>
+                  setEditFormData((prev) => ({ ...prev, description: value }))
                 }
               />
             </div>
