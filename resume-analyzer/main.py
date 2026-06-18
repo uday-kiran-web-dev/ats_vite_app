@@ -16,6 +16,9 @@ UPLOAD_FOLDER = "uploads"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 @app.post("/analyze-resume")
 async def analyze_resume(
