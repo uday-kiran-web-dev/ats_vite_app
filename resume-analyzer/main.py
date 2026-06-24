@@ -58,7 +58,7 @@ async def analyze_resume(
     return result
 
 
-# Keep the server alive on Render.com
+# Keep the server alive
 RENDER_APP_URL = "https://ats-resume-analyzer-1njj.onrender.com/ping"
 
 async def keep_alive():
