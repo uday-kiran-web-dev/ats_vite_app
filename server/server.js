@@ -3,6 +3,9 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 
+const cron = require("node-cron");
+const https = require("https");
+
 const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
@@ -69,8 +72,30 @@ app.get("/api/email-test", async (req, res) => {
   });
 });
 
+// Simple health-check endpoint
+app.get("/ping", (req, res) => {
+  res.status(200).send("Pong!");
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server is running on: ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
+
+  // Start the cron job to keep the server alive
+  // This runs every 14 minutes (Render sleeps after 15 mins of inactivity)
+  cron.schedule("*/14 * * * *", () => {
+    // REPLACE THIS WITH YOUR ACTUAL RENDER APP URL
+    const RENDER_APP_URL = "https://ats-vite-app.onrender.com/ping";
+
+    console.log("Sending self-ping to stay awake...");
+
+    https
+      .get(RENDER_APP_URL, (res) => {
+        console.log(`Ping status: ${res.statusCode}`);
+      })
+      .on("error", (err) => {
+        console.error("Error during self-ping:", err.message);
+      });
+  });
 });
