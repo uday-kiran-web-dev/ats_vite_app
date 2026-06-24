@@ -1,3 +1,6 @@
+import asyncio
+import httpx
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, File, Form
 import shutil
 import os
@@ -15,10 +18,6 @@ app = FastAPI()
 UPLOAD_FOLDER = "uploads"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
 
 @app.post("/analyze-resume")
 async def analyze_resume(
@@ -57,3 +56,32 @@ async def analyze_resume(
     result["candidateSkills"] = candidate_skills
 
     return result
+
+
+# Keep the server alive on Render.com
+RENDER_APP_URL = "https://ats-resume-analyzer-1njj.onrender.com/ping"
+
+async def keep_alive():
+    await asyncio.sleep(10)
+    async with httpx.AsyncClient() as client:
+        while True:
+            try:
+                await client.get(RENDER_APP_URL)
+            except Exception:
+                pass
+            await asyncio.sleep(840)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    asyncio.create_task(keep_alive())
+    yield
+
+app = FastAPI(lifespan=lifespan)
+
+@app.get("/")
+def read_root():
+    return {"status": "Production FastAPI server is active."}
+
+@app.get("/ping")
+def ping():
+    return "Pong!"
