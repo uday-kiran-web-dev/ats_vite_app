@@ -74,9 +74,9 @@ async def analyze_resume(
 
     return result
 
-@app.get("/ping")
-def ping():
-    return "Pong!"
+# @app.get("/ping")
+# def ping():
+#     return "Pong!"
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
+# if __name__ == "__main__":
+#     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
