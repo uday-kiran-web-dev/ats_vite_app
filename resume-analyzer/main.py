@@ -17,24 +17,26 @@ UPLOAD_FOLDER = "uploads"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-RENDER_APP_URL = "https://ats-resume-analyzer-1njj.onrender.com/ping"
+# RENDER_APP_URL = "https://ats-resume-analyzer-1njj.onrender.com/ping"
 
-async def keep_alive():
-    await asyncio.sleep(10)
-    async with httpx.AsyncClient() as client:
-        while True:
-            try:
-                await client.get(RENDER_APP_URL)
-            except Exception:
-                pass
-            await asyncio.sleep(840)
+# async def keep_alive():
+#     await asyncio.sleep(10)
+#     async with httpx.AsyncClient() as client:
+#         while True:
+#             try:
+#                 await client.get(RENDER_APP_URL)
+#             except Exception:
+#                 pass
+#             await asyncio.sleep(840)
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    asyncio.create_task(keep_alive())
-    yield
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     asyncio.create_task(keep_alive())
+#     yield
 
-app = FastAPI(lifespan=lifespan)
+# app = FastAPI(lifespan=lifespan)
+
+app = FastAPI()
 
 @app.post("/analyze-resume")
 async def analyze_resume(

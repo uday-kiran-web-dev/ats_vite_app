@@ -58,6 +58,7 @@ const registerUser = async (req, res) => {
       lastName: user.lastName,
       email: user.email,
       role: user.role,
+      phone: user.phone,
       isActive: user.isActive,
       token: generateToken(user._id),
     });
