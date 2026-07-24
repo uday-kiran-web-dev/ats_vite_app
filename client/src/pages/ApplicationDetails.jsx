@@ -314,58 +314,58 @@ function ApplicationDetails() {
                         {application.matchReport?.experienceMatch || "N/A"}
                       </p>
                     </div>
+
+                    <div className="mt-6 border-t border-gray-200 pt-4">
+                      <h3 className="text-lg font-semibold mb-4">Match Report</h3>
+                      <div className="grid gap-4">
+                        <div>
+                          <h4 className="text-sm font-semibold">Matched Skills</h4>
+                          {application.matchReport?.skillsMatch?.length ? (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {application.matchReport.skillsMatch.map(
+                                (skill, index) => (
+                                  <span
+                                    key={index}
+                                    className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
+                                  >
+                                    {skill}
+                                  </span>
+                                ),
+                              )}
+                            </div>
+                          ) : (
+                            <p className="mt-2 text-sm text-gray-500">None</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <h4 className="text-sm font-semibold">Missing Skills</h4>
+                          {application.matchReport?.missingSkills?.length ? (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {application.matchReport.missingSkills.map(
+                                (skill, index) => (
+                                  <span
+                                    key={index}
+                                    className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-700"
+                                  >
+                                    {skill}
+                                  </span>
+                                ),
+                              )}
+                            </div>
+                          ) : (
+                            <p className="mt-2 text-sm text-gray-500">None</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
 
             {userCanEdit ? (
-              <div className="grid gap-6 lg:grid-cols-2">
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-4">Match Report</h3>
-                  <div className="grid gap-4">
-                    <div>
-                      <h4 className="text-sm font-semibold">Matched Skills</h4>
-                      {application.matchReport?.skillsMatch?.length ? (
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {application.matchReport.skillsMatch.map(
-                            (skill, index) => (
-                              <span
-                                key={index}
-                                className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700"
-                              >
-                                {skill}
-                              </span>
-                            ),
-                          )}
-                        </div>
-                      ) : (
-                        <p className="mt-2 text-sm text-gray-500">None</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <h4 className="text-sm font-semibold">Missing Skills</h4>
-                      {application.matchReport?.missingSkills?.length ? (
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {application.matchReport.missingSkills.map(
-                            (skill, index) => (
-                              <span
-                                key={index}
-                                className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-700"
-                              >
-                                {skill}
-                              </span>
-                            ),
-                          )}
-                        </div>
-                      ) : (
-                        <p className="mt-2 text-sm text-gray-500">None</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
+              <div className="grid gap-6">
                 <div className="bg-white p-6 rounded-lg shadow space-y-6">
                   <div>
                     <div className="flex items-center justify-between">
